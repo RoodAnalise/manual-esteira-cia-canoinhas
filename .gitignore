@@ -1,0 +1,9 @@
+# Sistema operacional
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Arquivos de trabalho
+*.tmp
+*.bak
+~$*

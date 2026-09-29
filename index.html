@@ -1,0 +1,1843 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Esteira de Alimentação de Carga CIA Canoinhas - Manual Técnico</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    
+    <style>
+        /* --- DESIGN SYSTEM GERAL --- */
+        :root {
+            --bg-body: #0a0b10;
+            --bg-sidebar: #051626;
+            --bg-card: #14181f;
+            --accent: #64ffda; /* Ciano Neon */
+            --whatsapp: #25d366; /* Verde Whats */
+            --text-main: #b0b8c8;
+            --text-white: #e6f1ff;
+            --border: #1e2d3d;
+            --gradient: linear-gradient(180deg, rgba(5,22,38,1) 0%, rgba(5,22,38,0) 100%);
+            --danger: #ff5252;
+            --warning: #ffca28;
+        }
+
+        /* --- MELHORIAS EXTRAS (Mobile, Print, Topo) --- */
+
+        /* 1. Botão Menu Mobile */
+        .mobile-toggle {
+            display: none; position: fixed; top: 15px; right: 15px; z-index: 5000;
+            background: var(--accent); color: #000; border: none; padding: 10px;
+            border-radius: 5px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            transition: transform 0.2s;
+        }
+        .mobile-toggle:active { transform: scale(0.95); }
+
+        /* Overlay Escuro para o Menu Mobile */
+        .sidebar-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); z-index: 1500; backdrop-filter: blur(3px);
+        }
+
+        @media (max-width: 900px) {
+            .mobile-toggle { display: block; }
+            .sidebar { 
+                display: flex; position: fixed; height: 100%; width: 280px; 
+                transform: translateX(-100%); transition: transform 0.3s ease-in-out;
+                z-index: 2000;
+            }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-overlay.active { display: block; }
+            .main-content { padding: 80px 20px 20px 20px; }
+        }
+
+        /* 2. Botão Voltar ao Topo */
+        #backToTop {
+            position: fixed; bottom: 60px; right: 30px; 
+            background: var(--bg-card); border: 1px solid var(--accent); color: var(--accent);
+            width: 50px; height: 50px; border-radius: 50%; display: flex; 
+            justify-content: center; align-items: center; cursor: pointer;
+            opacity: 0; transition: 0.3s; pointer-events: none; z-index: 1500;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        #backToTop.show { opacity: 1; pointer-events: all; }
+        #backToTop:hover { background: var(--accent); color: #000; }
+
+        /* 3. Modo de Impressão */
+        @media print {
+            body { background-color: #fff; color: #000; display: block; height: auto; overflow: visible; }
+            .sidebar, .mobile-toggle, .search-container, #lightbox, #backToTop, .btn-cotar { display: none !important; }
+            .credit-bar { position: static; background: none; border: none; color: #000; padding: 20px 0 0; }
+            .credit-bar strong { color: #000; }
+            .main-content { padding: 0; background: none; }
+            .main-content::before { display: none; }
+            .container { max-width: 100%; }
+            h1, h2, h3, h4, strong { color: #000 !important; border-color: #000 !important; }
+            p, li, td, th { color: #000 !important; }
+            .data-card, .component-box, .alert-box, table, th, td { 
+                border: 1px solid #000 !important; 
+                background: #fff !important; 
+                color: #000 !important;
+                box-shadow: none !important;
+            }
+            .img-wrapper { opacity: 1 !important; transform: none !important; width: 80% !important; margin: 20px auto; }
+            .img-wrapper img { mask-image: none !important; -webkit-mask-image: none !important; }
+            a { text-decoration: none; color: #000; }
+            section { page-break-inside: avoid; margin-bottom: 50px; }
+            h2 { page-break-before: always; }
+        }
+
+        /* --- SCROLLBAR --- */
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: var(--bg-body); }
+        ::-webkit-scrollbar-thumb { 
+            background: #1e2d3d; 
+            border-radius: 5px; 
+            border: 2px solid var(--bg-body);
+        }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+        /* --- CAIXA DE PESQUISA --- */
+        .search-container {
+            padding: 20px 20px 0 20px;
+            position: relative;
+        }
+        .search-input {
+            width: 100%;
+            padding: 12px 15px 12px 40px; 
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-white);
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+            transition: 0.3s;
+        }
+        .search-input:focus {
+            border-color: var(--accent);
+            background: rgba(100, 255, 218, 0.05);
+            box-shadow: 0 0 15px rgba(100, 255, 218, 0.1);
+        }
+        .search-icon {
+            position: absolute;
+            left: 32px;
+            top: 32px;
+            color: #5d748a;
+            font-size: 1.2rem;
+            pointer-events: none; 
+        }
+        .highlight-text {
+            background-color: rgba(100, 255, 218, 0.3);
+            color: #fff;
+            border-radius: 2px;
+            padding: 0 2px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            line-height: 1.7;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 340px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+            flex-shrink: 0;
+        }
+
+        /* --- LOGO / BRANDING --- */
+        .brand {
+            padding: 40px 20px;
+            background: var(--gradient);
+            border-bottom: 1px solid var(--border);
+            text-align: center;
+        }
+        .brand h1 { 
+            color: var(--text-white); 
+            font-size: 1.8rem; font-weight: 800; letter-spacing: 1px; 
+            margin-bottom: 5px; text-transform: uppercase;
+            text-shadow: 0 0 15px rgba(100, 255, 218, 0.4);
+        }
+        .brand span { 
+            color: var(--accent); font-size: 0.9rem; font-weight: 700; 
+            text-transform: uppercase; letter-spacing: 3px; margin-top: 8px;
+            display: inline-block; border: 1px solid var(--accent); 
+            padding: 5px 12px; border-radius: 4px; background: rgba(100, 255, 218, 0.05);
+        }
+
+        .nav-scroll { flex: 1; overflow-y: auto; padding: 20px 0; }
+        
+        .nav-divider {
+            color: #5d748a; font-weight: bold; margin-top: 25px; margin-bottom: 5px; 
+            padding-left: 25px; font-size: 0.75rem; letter-spacing: 1px; pointer-events: none; border-bottom: 1px solid #1e2d3d; padding-bottom: 5px;
+        }
+
+        .nav-item {
+            display: flex; align-items: center; padding: 12px 25px;
+            color: var(--text-main); text-decoration: none; font-size: 0.9rem;
+            transition: 0.2s; border-left: 3px solid transparent;
+        }
+        .nav-item:hover, .nav-item.active {
+            background: rgba(100, 255, 218, 0.05); color: var(--accent);
+            border-left-color: var(--accent);
+        }
+        .nav-item i { margin-right: 12px; font-size: 1.2rem; }
+
+        /* --- CONTEÚDO PRINCIPAL (COM MARCA D'ÁGUA) --- */
+        .main-content {
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 60px;
+            background-image: radial-gradient(circle at 5% 5%, #112240 0%, var(--bg-body) 40%);
+            position: relative; 
+            overflow-x: hidden;
+        }
+
+        /* MARCA D'ÁGUA HORIZONTAL */
+        .main-content::before {
+            content: "ZICO";
+            position: fixed;
+            top: 50%; left: 50%; 
+            transform: translate(-50%, -50%);
+            font-size: 25vw; font-weight: 900; 
+            color: rgba(255, 255, 255, 0.04);
+            pointer-events: none; z-index: 0; 
+            font-family: 'Arial Black', sans-serif;
+            white-space: nowrap;
+        }
+
+        .container { 
+            max-width: 1000px; margin: 0 auto; padding-bottom: 150px; 
+            position: relative; z-index: 1;
+        }
+
+        /* --- TIPOGRAFIA --- */
+        h1.page-title { font-size: 2.5rem; color: var(--text-white); margin-bottom: 10px; border-left: 4px solid var(--accent); padding-left: 20px; text-transform: uppercase; }
+        h2 { font-size: 1.8rem; color: var(--text-white); margin: 80px 0 30px; border-bottom: 1px solid var(--border); padding-bottom: 10px; display: flex; align-items: center; }
+        h2 i { color: var(--accent); margin-right: 15px; }
+        h3 { font-size: 1.3rem; color: var(--accent); margin: 40px 0 15px; font-weight: 600; }
+        
+        p { margin-bottom: 20px; text-align: justify; font-size: 1rem; color: #c0c7d6; }
+        strong { color: #fff; font-weight: 700; }
+        ul, ol { margin-left: 25px; margin-bottom: 25px; }
+        li { margin-bottom: 12px; color: #c0c7d6; }
+        .text-danger { color: var(--danger); font-weight: bold; }
+        .text-warn { color: var(--warning); font-weight: bold; }
+
+        /* --- IMAGENS --- */
+        .img-wrapper {
+            position: relative; margin: 80px auto; width: 50%; 
+            opacity: 0; transform: translateY(60px) scale(0.95);
+            transition: opacity 2.5s ease-out, transform 2.5s cubic-bezier(0.2, 1, 0.3, 1);
+            box-shadow: none; border: none; background: transparent;
+        }
+        .img-wrapper.visible { opacity: 1; transform: translateY(0) scale(1); }
+        .img-wrapper img {
+            width: 100%; display: block;
+            -webkit-mask-image: radial-gradient(circle, black 40%, transparent 100%);
+            mask-image: radial-gradient(circle, black 40%, transparent 100%);
+            transition: transform 2s ease, -webkit-mask-image 2s ease;
+        }
+        .img-wrapper:hover img {
+            transform: scale(1.05);
+            -webkit-mask-image: radial-gradient(circle, black 60%, transparent 100%);
+            mask-image: radial-gradient(circle, black 60%, transparent 100%);
+        }
+        .zoom-hint {
+            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+            color: var(--accent); font-size: 0.65rem; text-transform: uppercase;
+            letter-spacing: 4px; opacity: 0; pointer-events: none;
+            transition: opacity 1s ease; text-shadow: 0 2px 10px rgba(0,0,0,1);
+        }
+        .img-wrapper:hover .zoom-hint { opacity: 0.7; }
+        
+        /* --- DIAGRAMAS --- */
+        .diagram-grid { display: flex; flex-wrap: wrap; gap: 20px; margin: 40px 0; justify-content: center; }
+        .diagram-card { text-align: center; border: 1px solid var(--border); padding: 15px; border-radius: 8px; width: 45%; }
+        .diagram-card strong { display: block; margin-bottom: 10px; color: var(--accent); font-size: 0.9rem; text-transform: uppercase; }
+        .diagram-card .img-wrapper { width: 80%; margin: 10px auto; } 
+
+        /* --- TABELAS & BOTÃO COTAR WHATSAPP --- */
+        .table-responsive { overflow-x: auto; margin: 30px 0; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        table { width: 100%; border-collapse: collapse; background: var(--bg-card); min-width: 800px; }
+        th, td { padding: 18px 20px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.95rem; color: #b0b8c8; vertical-align: middle; }
+        th { background: #0d1f30; color: var(--accent); text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; font-weight: 700; }
+        tr:hover { background: rgba(255,255,255,0.02); }
+
+        /* Estilo do Botão de Cotar na Tabela */
+        .btn-cotar {
+            background-color: transparent;
+            border: 1px solid var(--whatsapp);
+            color: var(--whatsapp);
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .btn-cotar:hover {
+            background-color: var(--whatsapp);
+            color: #000;
+        }
+        .btn-cotar i { font-size: 1rem; }
+
+        /* --- ACORDEÃO --- */
+        .accordion {
+            background-color: var(--bg-card); color: var(--text-white); cursor: pointer; padding: 20px 25px; width: 100%;
+            text-align: left; border: none; outline: none; transition: 0.3s; border-bottom: 1px solid var(--border);
+            font-size: 1rem; font-weight: 600; display: flex; justify-content: space-between; align-items: center;
+        }
+        .accordion:hover, .accordion.active { background-color: rgba(100, 255, 218, 0.05); color: var(--accent); }
+        .accordion i { transition: transform 0.3s; }
+        .accordion.active i { transform: rotate(180deg); }
+        .panel { padding: 0 30px; background-color: #0e1217; max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; border-left: 2px solid var(--accent); }
+        .panel p { margin: 25px 0; font-size: 0.95rem; color: #a0aab5; }
+
+        /* --- EXTRAS --- */
+        .data-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 20px; margin-top: 40px; }
+        .data-card { background: rgba(100, 255, 218, 0.03); border: 1px solid var(--border); padding: 20px; border-radius: 6px; }
+        .data-card strong { color: var(--accent); display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .data-card span { color: var(--text-white); font-size: 1rem; }
+
+        .component-box { background: #10141a; border-left: 3px solid var(--accent); padding: 25px; margin-bottom: 30px; border-radius: 0 6px 6px 0; }
+        .component-box h4 { color: var(--text-white); margin: 0 0 15px 0; text-transform: uppercase; font-size: 1rem; }
+
+        .alert-box { background: rgba(255, 82, 82, 0.05); border-left: 4px solid #ff5252; padding: 25px; border-radius: 4px; margin: 40px 0; display: flex; gap: 20px; }
+        .alert-box i { color: #ff5252; font-size: 2rem; }
+        .alert-box h4 { color: #ff5252; margin: 0 0 5px 0; text-transform: uppercase; letter-spacing: 1px; }
+        .alert-box p { text-align: left; }
+
+        .warn-box { background: rgba(255, 202, 40, 0.05); border-left: 4px solid #ffca28; padding: 25px; border-radius: 4px; margin: 40px 0; display: flex; gap: 20px; }
+        .warn-box i { color: #ffca28; font-size: 2rem; }
+        .warn-box h4 { color: #ffca28; margin: 0 0 5px 0; text-transform: uppercase; letter-spacing: 1px; }
+        .warn-box p { text-align: left; }
+
+        /* --- DIAGNÓSTICO DE FALHAS (CARDS) --- */
+        .diag-filters { display: flex; flex-wrap: wrap; gap: 10px; margin: 30px 0 10px; }
+        .diag-filter {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+            color: var(--text-main); padding: 8px 16px; border-radius: 20px;
+            font-size: 0.8rem; font-family: inherit; cursor: pointer; transition: 0.2s;
+            display: inline-flex; align-items: center; gap: 7px;
+        }
+        .diag-filter:hover, .diag-filter.active { border-color: var(--accent); color: var(--accent); background: rgba(100,255,218,0.06); }
+        .diag-filter .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+        .diag-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); gap: 16px; margin: 25px 0 40px; }
+        .diag-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-left: 4px solid var(--border); border-radius: 8px;
+            padding: 20px 22px; transition: 0.25s; position: relative; overflow: hidden;
+        }
+        .diag-card:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.45); }
+        .diag-card.sev-critico { border-left-color: #ff5252; }
+        .diag-card.sev-atencao { border-left-color: #ffca28; }
+        .diag-card.sev-ajuste  { border-left-color: #64ffda; }
+
+        .diag-head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+        .diag-num {
+            flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.72rem; font-weight: 700; color: var(--bg-body);
+        }
+        .sev-critico .diag-num { background: #ff5252; }
+        .sev-atencao .diag-num { background: #ffca28; }
+        .sev-ajuste  .diag-num { background: #64ffda; }
+
+        .diag-title { font-weight: 700; color: var(--text-white); font-size: 1rem; line-height: 1.35; }
+        .diag-badge {
+            display: inline-block; font-size: 0.6rem; font-weight: 700; letter-spacing: 1px;
+            text-transform: uppercase; padding: 3px 8px; border-radius: 3px; margin-bottom: 6px;
+        }
+        .sev-critico .diag-badge { background: rgba(255,82,82,0.15); color: #ff8a8a; }
+        .sev-atencao .diag-badge { background: rgba(255,202,40,0.15); color: #ffca28; }
+        .sev-ajuste  .diag-badge { background: rgba(100,255,218,0.12); color: var(--accent); }
+
+        .diag-row { display: flex; gap: 10px; margin-bottom: 10px; font-size: 0.87rem; }
+        .diag-row:last-child { margin-bottom: 0; }
+        .diag-row i { flex-shrink: 0; font-size: 1rem; margin-top: 1px; }
+        .diag-row.causa i { color: #5d748a; }
+        .diag-row.check i { color: #64ffda; }
+        .diag-row.fix i { color: #ffca28; }
+        .diag-row b { display: block; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 1.2px; color: #5d748a; font-weight: 700; margin-bottom: 2px; }
+        .diag-row span { color: #c0c7d6; text-align: left; }
+
+        /* --- RESPONSIVO / MOBILE --- */
+
+        /* 1. Telas grandes */
+        @media (min-width: 1600px) {
+            .container { max-width: 1200px; }
+            .main-content { padding: 70px 80px; }
+        }
+
+        /* 2. Tablets e notebooks pequenos */
+        @media (max-width: 1200px) {
+            .main-content { padding: 50px 40px; }
+            .container { padding-bottom: 120px; }
+        }
+
+        /* 3. Tablets */
+        @media (max-width: 1024px) {
+            .sidebar { width: 300px; }
+            .main-content { padding: 45px 30px; }
+            h1.page-title { font-size: 2rem; }
+            h2 { font-size: 1.55rem; }
+            h3 { font-size: 1.15rem; }
+            .diag-grid { grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); }
+        }
+
+        /* 4. Celulares grandes */
+        @media (max-width: 768px) {
+            body { height: 100dvh; }
+            .main-content { padding: 80px 18px 40px 18px; }
+            .container { padding-bottom: 100px; }
+
+            h1.page-title { font-size: 1.6rem; padding-left: 14px; }
+            h2 { font-size: 1.35rem; margin: 60px 0 22px; }
+            h2 i { font-size: 1.1rem; margin-right: 10px; }
+            h3 { font-size: 1.05rem; margin: 30px 0 12px; }
+            h4 { font-size: 0.95rem; }
+
+            p { font-size: 0.95rem; text-align: left; }
+            ul, ol { margin-left: 18px; }
+            li { font-size: 0.92rem; }
+
+            /* Tabelas: sem largura minima, fonte menor, celulas quebram */
+            table { min-width: 0 !important; }
+            th, td { padding: 11px 12px; font-size: 0.82rem; }
+            th { font-size: 0.68rem; letter-spacing: 0.5px; }
+
+            /* Grids sem largura minima fixa */
+            .data-grid, .diag-grid { grid-template-columns: 1fr; gap: 14px; }
+
+            /* Imagens ocupam toda a largura */
+            .img-wrapper { width: 100% !important; margin: 40px auto; }
+            .diagram-card { width: 100%; }
+            .diagram-grid { gap: 14px; }
+
+            /* Caixas com padding menor */
+            .component-box, .alert-box, .warn-box { padding: 18px; gap: 12px; }
+            .alert-box i, .warn-box i { font-size: 1.4rem; }
+
+            /* Acordeao */
+            .accordion { padding: 16px 18px; font-size: 0.92rem; }
+            .panel { padding: 0 18px; }
+
+            /* Diagnostico */
+            .diag-filters { gap: 8px; }
+            .diag-filter { padding: 7px 12px; font-size: 0.75rem; }
+            .diag-card { padding: 16px 18px; }
+            .diag-title { font-size: 0.95rem; }
+
+            /* Botao voltar ao topo */
+            #backToTop { width: 44px; height: 44px; bottom: 52px; right: 16px; }
+        }
+
+        /* 5. Celulares pequenos */
+        @media (max-width: 480px) {
+            .main-content { padding: 76px 12px 30px 12px; }
+            h1.page-title { font-size: 1.35rem; }
+            h2 { font-size: 1.18rem; }
+            h3 { font-size: 0.98rem; }
+            th, td { padding: 9px 8px; font-size: 0.75rem; }
+            .data-card { padding: 15px; }
+            .data-card span { font-size: 0.92rem; }
+            .credit-bar { font-size: 0.56rem; padding: 6px 10px; letter-spacing: 0.4px; }
+            .mobile-toggle { top: 10px; right: 10px; padding: 8px; }
+        }
+
+        /* 6. Telas muito largas / TVs */
+        @media (min-width: 2200px) {
+            .container { max-width: 1400px; }
+        }
+
+        /* --- BARRA DE CRÉDITO FIXA NO RODAPÉ --- */
+        .credit-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 3000;
+            background: rgba(5, 22, 38, 0.96);
+            backdrop-filter: blur(6px);
+            border-top: 1px solid var(--border);
+            padding: 7px 20px;
+            text-align: center;
+            font-size: 0.65rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #3d4f63;
+            pointer-events: none;
+            user-select: none;
+        }
+        .credit-bar strong { color: #5d748a; font-weight: 600; }
+
+        /* --- LIGHTBOX --- */
+        #lightbox { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 5000; justify-content: center; align-items: center; }
+        #lightbox img { max-width: 90%; max-height: 90%; border: 1px solid var(--accent); box-shadow: 0 0 50px rgba(100,255,218,0.15); }
+        #lightbox-close { position: absolute; top: 30px; right: 40px; font-size: 3rem; color: white; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <!-- BOTÃO MENU MOBILE -->
+    <button class="mobile-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">
+        <i class="material-icons-round">menu</i>
+    </button>
+    <div class="sidebar-overlay" onclick="document.querySelector('.sidebar').classList.remove('open'); this.classList.remove('active');"></div>
+    <div id="lightbox" onclick="this.style.display='none'">
+        <span id="lightbox-close">&times;</span>
+        <img id="lightbox-img" alt="">
+    </div>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+        <div class="brand">
+            <h1>CIA CANOINHAS</h1>
+            <span>Esteira de Alimentação de Carga</span>
+        </div>
+
+        <div class="search-container">
+            <i class="material-icons-round search-icon">search</i>
+            <input type="text" id="searchInput" class="search-input" placeholder="Buscar no manual..." onkeyup="searchManual()">
+        </div>
+
+        <div class="nav-scroll">
+            <a href="#capa" class="nav-item active"><i class="material-icons-round">home</i> Capa / Dados</a>
+            
+            <div class="nav-divider">1–2. EQUIPAMENTO E COMPONENTES</div>
+            <a href="#aplicacao" class="nav-item">Aplicação e Operação</a>
+            <a href="#componentes" class="nav-item">Componentes</a>
+            
+            <div class="nav-divider">3. SEGURANÇA</div>
+            <a href="#dispositivos" class="nav-item">Dispositivos de Segurança</a>
+            <a href="#seguranca-bau" class="nav-item">Segurança no Baú</a>
+            <a href="#seguranca" class="nav-item">Conformidade NR-12</a>
+            
+            <div class="nav-divider">4. POSICIONAMENTO</div>
+            <a href="#posicionamento" class="nav-item">Checklist no Caminhão</a>
+            
+            <div class="nav-divider">5. MANUTENÇÃO</div>
+            <a href="#lubrificacao" class="nav-item">Plano de Lubrificação</a>
+            <a href="#tensionamento" class="nav-item">Tensionamento e Ajustes</a>
+            <a href="#correia" class="nav-item">Correia e Emenda</a>
+            <a href="#guia-central" class="nav-item">Guia Central</a>
+            <a href="#rodizio" class="nav-item">Rodízios e Estrutura</a>
+            <a href="#mancais" class="nav-item">Mancais e Engrenagens</a>
+            <a href="#motor" class="nav-item">Motor e Redutor</a>
+            
+            <div class="nav-divider">6. DIAGNÓSTICO</div>
+            <a href="#diagnostico" class="nav-item">Diagnóstico de Falhas</a>
+            
+            <div class="nav-divider">7. REPOSIÇÃO</div>
+            <a href="#dados-tecnicos" class="nav-item">Lista de Peças</a>
+        </div>
+    </nav>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="main-content">
+        <div class="container">
+
+            <section id="capa">
+                <h1 class="page-title">Manual de Instruções</h1>
+                <h2>Esteira de Alimentação de Carga — CIA Canoinhas</h2>
+
+                <div class="img-wrapper visible" style="width: 85%;">
+                    <img src="imagens/capa.jpg" onclick="openLightbox(this)" style="cursor: zoom-in;" alt="Esteira de Alimentação de Carga CIA Canoinhas - foto de apresentação">
+                    <span class="zoom-hint">Clique para ampliar</span>
+                </div>
+
+                <div class="data-grid">
+                    <div class="data-card">
+                        <strong>Cliente</strong>
+                        <span>CIA CANOINHAS</span>
+                    </div>
+                    <div class="data-card">
+                        <strong>CNPJ / IE</strong>
+                        <span>Preencher</span>
+                    </div>
+                    <div class="data-card">
+                        <strong>Endereço</strong>
+                        <span>Canoinhas - SC<br>CEP 89460-000</span>
+                    </div>
+                    <div class="data-card">
+                        <strong>Equipamento</strong>
+                        <span>Esteira de Alimentação de Carga<br>Móvel sobre rodízios</span>
+                    </div>
+                    <div class="data-card">
+                        <strong>Correia</strong>
+                        <span>PVC 2 lonas, preto fosco<br>V220B 05M00 · 800 mm · guia central</span>
+                    </div>
+                    <div class="data-card">
+                        <strong>Comprimentos</strong>
+                        <span>Correia 24.012 mm · corrente ASA 50 · 64 elos<br>Código 28470</span>
+                    </div>
+                    <div class="data-card">
+                        <strong>Acionamento</strong>
+                        <span>Motoredutor WEG 2,2 kW / 3 cv<br>Redutor WCG01 i = 1:20</span>
+                    </div>
+                    <div class="data-card">
+                        <strong>Dimensões e Peso</strong>
+                        <span>11.900 × 940 × 830 mm<br>980 kg</span>
+                    </div>
+                    <div class="data-card">
+                        <strong>Rodízios</strong>
+                        <span>2 Colson 8" dianteiros (com amortecedor)<br>2 similares 8" traseiros (com freio)</span>
+                    </div>
+                    <div class="data-card">
+                        <strong>Altura da Mesa</strong>
+                        <span>830 mm do piso<br>(rodízio 8" + pé de fixação)</span>
+                    </div>
+                    <div class="data-card">
+                        <strong>Segurança</strong>
+                        <span>Cordão de emergência Schmersal<br>+ fotocélula refletiva PAR-2MDNP</span>
+                    </div>
+                    <div class="data-card">
+                        <strong>Código de Fabricação</strong>
+                        <span><strong style="color: var(--accent); font-size: 1.3rem; letter-spacing: 2px;">28470</strong></span>
+                    </div>
+                    <div class="data-card">
+                        <strong>Versão do Documento</strong>
+                        <span>01-26</span>
+                    </div>
+                </div>
+            </section>
+
+            <section id="aplicacao">
+                <h2><i class="material-icons-round">local_shipping</i> 1. O Equipamento</h2>
+
+                <h3>1.1 O que é este equipamento</h3>
+                <p>A <strong>Esteira de Alimentação de Carga CIA Canoinhas</strong>, código de fabricação <strong>28470</strong>, é uma esteira transportadora <strong>móvel sobre rodízios</strong> concebida para as operações de carga e descarga de veículos. A estrutura é dividida em duas partes: uma ponta permanece <strong>do lado de fora</strong>, no piso, e a outra é <strong>conduzida para dentro do baú</strong> do caminhão, ficando apoiada sobre o piso da caçamba.</p>
+                <p>Dessa forma, a esteira funciona como uma <strong>ponte</strong> entre o estoque de pacotes e o baú: o operador no lado de fora coloca o pacote sobre a correia, a correia o conduz até o interior do baú, e o <strong>segundo operador, positioned dentro do baú</strong>, retira o pacote e faz o empilhamento. Com isso elimina-se o lançamento manual de dentro para fora, que é a causa mais comum de lesão por esforço repetitivo e de queda de carga na operação de carga.</p>
+
+                <div class="data-grid">
+                    <div class="data-card">
+                        <strong>Operador 1 (Externo)</strong>
+                        <span>Alimenta a correia com os pacotes e monitora o painel de comando</span>
+                    </div>
+                    <div class="data-card">
+                        <strong>Operador 2 (Interno)</strong>
+                        <span>Retira os pacotes da ponta interna e organiza a carga dentro do baú</span>
+                    </div>
+                </div>
+
+                <h3>1.2 Fluxo da Operação</h3>
+                <ol>
+                    <li><strong>Preparo:</strong> a esteira é empurrada até o caminhão e posicionada, travando-se os rodízios.</li>
+                    <li><strong>Conferência:</strong> verifica-se a tensão da correia, o aperto do painel e a integridade do cabo elétrico.</li>
+                    <li><strong>Entrada do operador interno:</strong> o operador 2 entra no baú e comunica sua posição ao operador 1.</li>
+                    <li><strong>Carga:</strong> o operador 1 aciona a esteira no painel e posiciona os pacotes sobre a correia.</li>
+                    <li><strong>Recebimento:</strong> o operador 2 retira o pacote, alinha e empilha conforme o plano de carga.</li>
+                    <li><strong>Desligamento e retirada:</strong> ao terminar, desliga-se o painel, o operador 2 sai do baú e a esteira é retirada com o caminhão ainda parado.</li>
+                </ol>
+
+                <h3>1.3 Comprimento da Correia</h3>
+                <p>A correia da esteira 28470 tem comprimento de <strong>24.012 mm</strong>, sendo <strong>23.872 mm</strong> de perímetro de percurso e <strong>140 mm</strong> de curso do esticador.</p>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Parâmetro</th>
+                                <th>Valor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Comprimento total da correia</td><td><strong>24.012 mm</strong></td></tr>
+                            <tr><td>Perímetro de percurso</td><td>23.872 mm</td></tr>
+                            <tr><td>Curso do esticador</td><td>140 mm</td></tr>
+                            <tr><td>Folga de emenda</td><td>Definida com o fornecedor da lona</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="alert-box">
+                    <i class="material-icons-round">straighten</i>
+                    <div>
+                        <h4>Fechamento do comprimento</h4>
+                        <p style="margin:0; text-align: left;">O comprimento final <strong>é fechado com o fabricante da correia</strong>, que define a folga de emenda. Na cotação, informe sempre a <strong>medição real em campo</strong> do perímetro de trabalho, e não apenas o valor de referência — correia comprida demais força o esticador até o fim de curso e reduz a vida útil da emenda.</p>
+                    </div>
+                </div>
+
+                <div class="component-box">
+                    <h4>Aclive de Operação</h4>
+                    <p style="margin:0;">O aclive é definido pela diferença de altura entre a ponta externa (piso do pátio) e a ponta interna (piso do baú). Como a esteira é <strong>lisa</strong>, a tração do pacote depende do atrito — registrar o aclive real da operação e observar se o pacote mantém o aderimento durante a carga.</p>
+                </div>
+
+                <h3>1.4 Mobilidade — Onde a Esteira Apoia</h3>
+                <p>A esteira é sustentada por <strong>quatro rodízios de 8"</strong>, dispostos em dois grupos:</p>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Conjunto</th>
+                                <th>Quantidade</th>
+                                <th>Tipo</th>
+                                <th>Posição</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Dianteiros</strong></td>
+                                <td>2</td>
+                                <td>Colson 8" giratórios <strong>com amortecedor</strong></td>
+                        <td>Na cabeceira (rolo de tração)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Traseiros</strong></td>
+                                <td>2</td>
+                                <td>Marca similar 8" giratórios <strong>com freio</strong></td>
+                        <td>No esticador</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>Os rodízios dianteiros são <strong>amortecidos</strong> para absorver o impacto da entrada da esteira no baú. Os traseiros têm <strong>freio</strong>, que é <strong>obrigatório</strong>: sem ele, a esteira pode rolear para dentro ou para fora durante a carga.</p>
+
+                <h3>1.5 Dimensões Principais</h3>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Cotação</th>
+                                <th>Valor</th>
+                                <th>Origem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>Comprimento total</strong></td><td><strong>11.900 mm</strong></td><td>Extremo a extremo da estrutura</td></tr>
+                            <tr><td><strong>Largura total</strong></td><td><strong>940 mm</strong></td><td>Largura da estrutura</td></tr>
+                            <tr><td><strong>Altura da mesa</strong></td><td><strong>830 mm</strong></td><td>Do piso até a superfície da mesa</td></tr>
+                            <tr><td><strong>Peso do conjunto</strong></td><td><strong>980 kg</strong></td><td>Sem carga</td></tr>
+                            <tr><td>Largura da correia</td><td>800 mm</td><td>Folga de 70 mm por lado sobre a estrutura</td></tr>
+                            <tr><td>Diâmetro do rolo de tração</td><td>112 mm</td><td>Para identificação da peça</td></tr>
+                            <tr><td>Rodízio dianteiro</td><td>2 Colson 8" com amortecedor</td><td>Na cabeceira</td></tr>
+                            <tr><td>Rodízio traseiro</td><td>2 similares 8" com freio</td><td>No esticador</td></tr>
+                            <tr><td>Furação da platina</td><td>A informar</td><td>Pendente de definição</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="component-box">
+                    <h4>Distribuição de Carga nos Rodízios</h4>
+                    <p>Com <strong>980 kg</strong> distribuídos em <strong>4 rodízios</strong>, cada um recebe:</p>
+                    <p style="font-size:1.15rem; text-align:center; margin: 12px 0;"><strong style="color:var(--accent); font-size:1.3rem;">245 kg por rodízio</strong></p>
+                <p style="margin:12px 0 0;">Com a esteira em aclive, a carga se redistribui entre os rodízios. Registrar o aclive real da operação e conferir a capacidade nominal de cada rodízio.</p>
+                    <ul>
+                        <li><strong>Confira a capacidade nominal de cada rodízio</strong> — o valor de projeto é próximo de 260 kg, e a capacidade tem de ser <strong>superior</strong> a isso, com folga para impacto na entrada do baú.</li>
+                        <li>Um rodízio subdimensionado <strong>queima o mancal</strong> e trava a esteira no meio da operação de carga.</li>
+                        <li>A estrutura tem <strong>70 mm de folga</strong> de cada lado da correia de 800 mm — é por onde passam o cordão de emergência, o suporte da fotocélula e o reforço central.</li>
+                    </ul>
+                </div>
+
+                <div class="component-box">
+                <h4>Por que 830 mm?</h4>
+                <p style="margin:0;">A altura de <strong>830 mm</strong> coloca a mesa na altura da cintura/quadril do operador, o que permite a <strong>alimentação manual sem esforço repetitivo</strong> e mantém o pacote na altura adequada de entrega dentro do baú. Essa altura é resultado do conjunto <strong>rodízio 8" + pé de fixação</strong> — mudar a altura do pé altera o comprimento útil da correia e exige recalcular o comprimento (ver seção 1.4).</p>
+                </div>
+
+                <div class="diagram-grid">
+                </div>
+            </section>
+
+            <section id="componentes">
+                <h2><i class="material-icons-round">category</i> 2. Componentes</h2>
+                <p>A esteira é formada por conjuntos pensados para serem mantidos em campo, sem dependência de oficina. A relação das peças de reposição, com botões de cotação, está na seção <a href="#dados-tecnicos" style="color: var(--accent);">Peças de Reposição</a>.</p>
+
+                <div class="component-box">
+                    <h4>1. Estrutura e Chassi</h4>
+                    <ul>
+                        <li><strong>Longarinas:</strong> perfis de aço-carbono que suportam os conjuntos de roletes, a correia e a carga. Devem ter caixote para impedir o acúmulo de serragem.</li>
+                        <li><strong>Travessas de amarração:</strong> mantêm o conjunto rígido e impedem a abertura das longarinas.</li>
+                        <li><strong>Tranversal de apoio:</strong> reforço intermediário que reduz a flecha (deformação) da correia no vão livre.</li>
+                    </ul>
+                </div>
+
+                <div class="component-box">
+                    <h4>2. Conjunto de Rodízios 8"</h4>
+                    <ul>
+                        <td>Na cabeceira (rolo de tração)</td>
+                        <td>No esticador</td>
+                        <li><strong>Amortecedor:</strong> absorve o impacto da entrada da esteira no baú e a oscilência entre o piso do pátio e o piso da caçamba.</li>
+                        <li><strong>Freio (traseiros):</strong> imobiliza a esteira durante a carga. Deve estar <strong>acionado</strong> sempre que houver operador dentro do baú.</li>
+                        <li><strong>Capacidade:</strong> 245 kg por rodízio (980 kg ÷ 4). Conferir a capacidade nominal — ver a seção 1.6.</li>
+                        <li><strong>Pé de fixação:</strong> conjunto que dá a altura final de <strong>830 mm</strong> da mesa em relação ao piso.</li>
+                    </ul>
+                </div>
+
+                <div class="component-box">
+                    <h4>3. Correia e Guia Central</h4>
+                    <ul>
+                        <li><strong>Correia CT V220B 05M00:</strong> lona de PVC preto fosco, 2 lonas, 800 mm de largura, com guia central.</li>
+                        <li><strong>Guia central:</strong> barra de sustentação que apoia a correia pelo centro e distribui a carga sobre o conjunto de roletes.</li>
+                        <li><strong>Canais da guia:</strong> a guia central entra em <strong>canal usinado</strong> no rolo de tração, no rolo esticador e na mesa — ver a seção 3.2.</li>
+                        <li><strong>Roletes da mesa:</strong> sustentam a correia pelo lado da carga, mantendo o alinhamento lateral.</li>
+                    </ul>
+                </div>
+
+                <div class="component-box">
+                    <h4>4. Acionamento (somente mecânico)</h4>
+                    <ul>
+                        <li><strong>Motor WEG 2,2 kW / 3 cv, flange 90 B14:</strong> aciona o conjunto. 4 polos, 1.750 rpm a 60 Hz.</li>
+                        <li><strong>Redutor WEG WCG01 V90 1HH C90 2,2 kW 4P, tamanho 090, relação 1:20, coroa e sem-fim:</strong> reduz a rotação e entrega torque constante na partida com carga.</li>
+                        <li><strong>Base rígida com 6 parafusos em furos oblongos:</strong> é por ela que se <strong>tensiona a corrente de tração</strong> — ver a seção 3.3.</li>
+                        <li><strong>Corrente de tração:</strong> transmite o giro do redutor ao <strong>rolo de tração</strong>.</li>
+                        <li><strong>Posição:</strong> na <strong>frente</strong> do equipamento, <strong>puxando</strong> a correia.</li>
+                        <li><strong>Acoplamento:</strong> elástico, protege motor e redutor de choques de partida.</li>
+                        <li><strong>Rolo de tração:</strong> D = 112 mm, com <strong>canal</strong> para a guia central.</li>
+                    </ul>
+                    <p style="margin:15px 0 0; font-size:0.9rem; color:#5d748a;"><em>O acionamento é totalmente mecânico: o ajuste da correia é feito pelo fusop M20 e o da corrente de tração pela base oblonga do motoredutor — sem nenhum eixo motorizado, hidráulico ou elétrico de ajuste.</em></p>
+                </div>
+
+                <div class="component-box">
+                    <h4>5. Cabeceira Oposta e Esticador</h4>
+                    <ul>
+                        <li><strong>Rolo esticador:</strong> conjunto móvel com <strong>canal</strong> para a guia central, que comprime a correia no lado de retorno.</li>
+                        <li><strong>Tensionador por fusop M20:</strong> barra roscada M20 com <strong>porca interna</strong> (tração) e <strong>porca externa</strong> (ajuste). Para tensionar, afrouxe a interna e aperte a externa.</li>
+                        <li><strong>Curso de ajuste:</strong> 140 mm. É a reserva de tensão para compensar o alongamento da correia em uso.</li>
+                    </ul>
+                </div>
+
+                <div class="component-box">
+                    <h4>6. Dispositivos de Segurança</h4>
+                    <ul>
+                        <li><strong>Cordão de emergência Schmersal:</strong> percorre a lateral da esteira, com cabo vermelho, olhais e guias intermediárias.</li>
+                        <li><strong>Fotocélula Metaltex PAR-2MDNP + refletor:</strong> detecção de pacotes na linha, com refletor no lado oposto.</li>
+                        <li><strong>Tampas / nips nas duas pontas:</strong> chapa de <strong>2,00 mm</strong>, protegendo o acesso às partes de entrada e saída.</li>
+                    </ul>
+                </div>
+
+                <div class="component-box">
+                    <h4>7. Painel de Comando</h4>
+                    <ul>
+                        <li><strong>Painel fixo na estrutura</strong> — <strong>anda com a esteira</strong>. No escopo do equipamento, apenas o <strong>envelope</strong> e os <strong>furos de cabo</strong>.</li>
+                        <li><strong>Botão Liga / Desliga (verde / vermelho):</strong> comando principal, ao alcance do operador externo.</li>
+                        <li><strong>Disjuntor termomagnético:</strong> proteção do motor, testado periodicamente.</li>
+                        <li><strong>Tomada e cabo de alimentação:</strong> ligação à rede elétrica. O cabo é o item mais sujeito a dano na operação — ver a seção de segurança.</li>
+                        <li><strong>Aterramento:</strong> borne dedicado, com borne da carcaça do motor e da estrutura.</li>
+                    </ul>
+                </div>
+
+                <div class="alert-box">
+                    <i class="material-icons-round">warning</i>
+                    <div>
+                        <h4>Atenção</h4>
+                        <p style="margin:0; text-align: left;">Nunca remover, furar ou soldar qualquer componente estrutural sem antes consultar a Zico. Alterações não homologadas anulam a garantia e comprometem a segurança da máquina — sobretudo a resistência do conjunto sobre rodízios, que é calculada para a carga máxima em aclive.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="dispositivos">
+                <h2><i class="material-icons-round">emergency</i> 3.1 Dispositivos de Segurança</h2>
+                <p>Os dispositivos de segurança são instalados <strong>integralmente na máquina</strong> e acompanham a esteira quando ela se desloca. Esta seção descreve cada um deles e as condições de uso.</p>
+
+                <h3>Cordão de Emergência (Schmersal)</h3>
+                <p>O <strong>cordão de emergência</strong> é um cabo de aço com <strong>capa vermelha</strong> que corre <strong>na lateral da estrutura</strong>, em toda a extensão, permitindo que qualquer operador — inclusive o que está dentro do baú — <strong>puxe o cabo para parar tudo</strong>. O acionamento é feito por um <strong>interruptor de segurança Schmersal</strong> sensível à tensão do cabo.</p>
+
+                <div class="component-box">
+                    <h4>Composição do Sistema</h4>
+                    <ul>
+                        <li><strong>Cabo de aço + capa vermelha:</strong> elemento que o operador puxa para acionar a parada.</li>
+                        <li><strong>Olhais:</strong> fixação do cabo nas pontas e nos pontos intermediários.</li>
+                        <li><strong>Guias intermediárias:</strong> conduzem o cabo e evitam que ele se afaste da estrutura ou enrole.</li>
+                        <li><strong>Interruptor Schmersal:</strong> sensor que detecta a tensão no cabo e comanda a parada.</li>
+                    </ul>
+                </div>
+
+                <div class="alert-box">
+                    <i class="material-icons-round">warning</i>
+                    <div>
+                        <h4>Regra de ouro do cordão</h4>
+                        <p style="margin:0; text-align: left;">O cabo do cordão de emergência <strong>corre pela alma do U</strong>, na <strong>lateral da estrutura</strong>. O <strong>reforço central não pode tapar o percurso do cabo</strong> — se o reforço for sobreposto ao canal, o cordão não passa e o sistema de parada fica inoperante. <strong>Antes de liberar a máquina para operação, puxe o cordão em toda a extensão</strong> e confirme a parada em cada ponto.</p>
+                    </div>
+                </div>
+
+                <h3>Fotocélula de Detecção (Metaltex PAR-2MDNP)</h3>
+                <p>A fotocélula é um <strong>sensor fotoelétrico refletivo</strong> montado em <strong>suporte Metaltex</strong>, com um <strong>refletor</strong> instalado no lado oposto da esteira. Ao detectar a presença de pacote na linha, ela envia o sinal ao comando — usado para <strong>contagem de pacotes</strong>, <strong>parada por acúmulo</strong> e <strong>controle de ciclo</strong>.</p>
+
+                <div class="component-box">
+                    <h4>Cuidados com o Sensor</h4>
+                    <ul>
+                        <li><strong>Limpar a lente e o refletor</strong> regularmente — poeira e serragem reduzem a confiabilidade da leitura.</li>
+                        <li><strong>Não ajustar o alinhamento</strong> fora da planta. O sensor e o refletor são emparelhados: mexer em um sem o outro compromete a detecção.</li>
+                        <li><strong>Verificar o aperto do suporte</strong> — o suporte Metaltex não pode girar nem tombar.</li>
+                        <li><strong>Se a fotocélula disparar indevidamente</strong>, primeiro limpe a lente. Só depois investigue o comando.</li>
+                    </ul>
+                </div>
+
+                <h3>Tampas e Nips das Pontas</h3>
+                <p>As duas pontas da esteira são fechadas por <strong>tampas / nips em chapa de 2,00 mm</strong>. Estas tampas impedem o acesso às partes móveis (entrada e saída da correia) e são um requisito da <strong>NR-12</strong>.</p>
+                <ul>
+                    <li>As tampas devem estar <strong>inteiras, parafusadas e sem folga</strong>.</li>
+                    <li>Antes de operar, confirme que <strong>nenhuma tampa está solta, deformada ou ausente</strong>.</li>
+                    <li>Nunca operar com a tampa removida, nem em condições de manutenção com a correia em movimento.</li>
+                </ul>
+
+                <h3>Checklist de Segurança — Antes de Cada Carga</h3>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Como Verificar</th>
+                                <th>Condição para Operar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Cordão de emergência</td><td>Puxar o cabo em toda a extensão</td><td>Parada em todos os pontos</td></tr>
+                            <tr><td>Interruptor Schmersal</td><td>Teste de acionamento</td><td>Aciona e rearma corretamente</td></tr>
+                            <tr><td>Fotocélula + refletor</td><td>Passar um pacote pela frente</td><td>Detecta e rearma</td></tr>
+                            <tr><td>Tampas das pontas</td><td>Inspeção visual</td><td>Íntegras e parafusadas</td></tr>
+                            <tr><td>Freios dos rodízios traseiros</td><td>Testar imobilização</td><td>Imobiliza a esteira</td></tr>
+                            <tr><td>Botão de desliga do painel</td><td>Localização e teste</td><td>Ao alcance, funciona</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="seguranca-bau">
+                <h2><i class="material-icons-round">warning</i> 3.2 Segurança no Interior do Baú</h2>
+                <p>O trabalho dentro do baú exige <strong>rota de saída livre</strong> e <strong>comunicação permanente</strong> com o operador externo. Esta seção define as exigências mínimas para a operação.</p>
+
+                <div class="component-box">
+                    <h4>Meios de Acesso e Saída</h4>
+                    <ul>
+                        <li><strong>Sempre manter uma rota de saída livre.</strong> O operador interno não pode ficar encurralado entre a carga empilhada e a parede do baú.</li>
+                        <li>A carga deve ser empilhada a partir da frente, deixando a região junto à traseira desimpedida para a saída.</li>
+                        <li>É TERMINALMENTE proibido o operador interno entrar no baú com a traseira fechada.</li>
+                    </ul>
+                </div>
+
+                <div class="component-box">
+                    <h4>Comunicação</h4>
+                    <ul>
+                        <li>Os dois operadores precisam se comunicar continuamente — idealmente por rádio comunicador.</li>
+                        <li>Se houver apenas um aparelho, ele fica com o operador <strong>externo</strong>, que é quem comanda a esteira.</li>
+                        <li>O operador interno deve <strong>imediatamente</strong> avisar qualquer irregularidade ao operador externo, que desliga a esteira no painel.</li>
+                    </ul>
+                </div>
+
+                <div class="component-box">
+                    <h4>Parada de Emergência</h4>
+                    <ul>
+                        <li>Antes de iniciar, o operador externo deve <strong>identificar o botão de desliga do painel</strong> e confirmar que ele está ao alcance da mão.</li>
+                        <li>O caminho até o painel não pode estar bloqueado por pacotes, paletes ou material empilhado.</li>
+                        <li>Em emergência, o operador interno deve <strong>caminhar até a traseira e sair do baú</strong> — nunca saltar lateralmente.</li>
+                    </ul>
+                </div>
+
+            </section>
+
+            <section id="seguranca">
+                <h2><i class="material-icons-round">verified_user</i> 3.3 Segurança Geral (NR-12)</h2>
+
+                <h3>Conformidade</h3>
+                <p>Esta esteira deve operar em conformidade com a <strong>NR-12</strong> (Segurança no Trabalho em Máquinas e Equipamentos). Abaixo, os requisitos obrigatórios que o operador e a manutenção devem conhecer.</p>
+
+                <div class="data-grid">
+                    <div class="data-card"><strong>Proteção fixa</strong><span>Bota de segurança no acoplamento e proteção da correia na cabeceira</span></div>
+                    <div class="data-card"><strong>Parada de emergência</strong><span>Botão de emergência ao alcance do operador externo</span></div>
+                    <div class="data-card"><strong>Bloqueio da fonte</strong><span>Disjuntor com trava para LOTO no painel</span></div>
+                    <div class="data-card"><strong>Freios</strong><span>Rodízios com freio acionado durante a carga</span></div>
+                    <div class="data-card"><strong>Sinalização</strong><span>Placa de identificação e advertência legíveis</span></div>
+                    <div class="data-card"><strong>Comando</strong><span>Painel com funções identificadas (Liga / Desliga)</span></div>
+                </div>
+
+                <div class="component-box" style="text-align: center;">
+                    <h4>Compromisso de Qualidade</h4>
+                    <p><em>"A segurança não é um dispositivo, é um estado de espírito e uma responsabilidade contínua."</em></p>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/ISO_7010_M002.svg/1200px-ISO_7010_M002.svg.png" style="width: 50px; margin-top: 20px; filter: invert(1);">
+                    <p style="font-size: 0.8rem; margin-top: 10px;">Consulte o Manual sempre que houver dúvida.</p>
+                </div>
+            </section>
+
+            <section id="posicionamento">
+                <h2><i class="material-icons-round">swap_vert</i> 4. Posicionamento no Caminhão</h2>
+                <p>Esta seção é a mais crítica da operação. O posicionamento errado pode prensar o operador entre a estrutura e a caçamba, fazer a esteira tombar, ou fazer o caminhão partir com a esteira presa dentro do baú.</p>
+
+                <h3>Checklist de Posicionamento</h3>
+                <button class="accordion" onclick="toggle(this)">
+                    <span><i class="material-icons-round" style="vertical-align:middle; margin-right:10px;">list</i> Antes de Empurrar a Esteira</span>
+                    <i class="material-icons-round">expand_more</i>
+                </button>
+                <div class="panel">
+                    <ul>
+                        <li><strong>Caminhão parado, freio de mão acionado e motor desligado.</strong> Sem exceção.</li>
+                        <li><strong>Caminhão parado</strong> e sem possibility de partida com a esteira dentro do baú.</li>
+                        <li><strong>Porta / escotilha traseira aberta</strong> e na posição de carga.</li>
+                        <li><strong>Piso do baú livre:</strong> sem cabos, ferramentas, paletes ou material solto no percurso da ponta interna.</li>
+                        <li><strong>Piso do pátio regular</strong> no trecho por onde a esteira será empurrada — evitar buracos e desníveis que travam os rodízios.</li>
+                        <li><strong>Raio de giro livre:</strong> conferir se o caminhão não está estacionado em local que impeça a abertura completa da traseira.</li>
+                    </ul>
+                </div>
+
+                <button class="accordion" onclick="toggle(this)">
+                    <span><i class="material-icons-round" style="vertical-align:middle; margin-right:10px;">checklist</i> Depois de Posicionar</span>
+                    <i class="material-icons-round">expand_more</i>
+                </button>
+                <div class="panel">
+                    <ul>
+                        <li><strong>Ponta interna apoiada</strong> totalmente sobre o piso do baú, sem ficar pendurada na borda ou apoiada naSpoiler do caminhão.</li>
+                        <li><strong>Freios de todos os rodízios acionados</strong> — a esteira não pode rolar para dentro nem para fora com o caminhão em movimento.</li>
+                        <li><strong>Inclinação conferida:</strong> a ponta externa deve estar no piso e a interna levemente mais alta. Confirme a inclinação com a régua ou o nível.</li>
+                        <li><strong>Cabo elétrico</strong> ligado de forma que não passe por baixo das rodas nem fique preso entre a estrutura e a caçamba.</li>
+                        <li><strong>Comunicação estabelecida</strong> com o operador interno antes de ligar a esteira.</li>
+                    </ul>
+                </div>
+
+                <div class="warn-box">
+                    <i class="material-icons-round">no_crash</i>
+                    <div>
+                        <h4>Prensamento do operador</h4>
+                        <p style="margin:0; text-align: left;">Nunca permita que o operador interno fique <strong>entre a estrutura da esteira e a lateral do baú</strong>. Ao deslocar a esteira, ele deve sair do baú. Um corpo prensado entre metal e madeira pode causar lesão fatal em poucos segundos — a esteira pesa centenas de quilos e os rodízios não têm frenagem suficiente para resistir ao impacto.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="lubrificacao">
+                <h2><i class="material-icons-round">oil_barrel</i> 5.1 Plano de Lubrificação</h2>
+                <p>Três pontos de lubrificação nesta esteira: <strong>mancais</strong>, <strong>rodízios</strong> e <strong>motoredutor</strong>.</p>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Ponto de Lubrificação</th>
+                                <th>Lubrificante</th>
+                                <th>Intervalo</th>
+                                <th>Quantidade</th>
+                                <th>Observação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>Mancais</strong> — 5x F206 com rolamentos EX206</td><td>Graxa EP-2</td><td>A cada 200 h</td><td>Filme</td><td>Não exceda — excesso aquece e queima o rolamento</td></tr>
+                            <tr><td><strong>Rodízios</strong> — 2 Colson 8" dianteiros e 2 traseiros 8"</td><td>Graxa EP-2</td><td>A cada 500 h</td><td>Filme</td><td>Ao rodar, deve ficar liso e sem ruído</td></tr>
+                            <tr><td><strong>Motoredutor</strong> — WEG 2,2 kW + WCG01 090</td><td>Óleo EP-80/90</td><td>Troca a cada 4.000 h</td><td>Até o nível</td><td>Verificar nível de óleo semanalmente</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Cuidados com a Lubrificação</h3>
+                <ul>
+                    <li><strong>Limpe antes de lubrificar:</strong> sempre remova poeira e serragem. Graxa contaminada com abrasivo acelera o desgaste do rolamento.</li>
+                    <li><strong>Dosagem:</strong> encher demais o mancal gera aquecimento e queima do rolamento.</li>
+                    <li><strong>Use a bomba de graxa</strong>, nunca o dedo para forçar graxa sob pressão.</li>
+                    <li><strong>Descarte</strong> sobras de lubrificante e estopas em contentores indicados, conforme a política ambiental.</li>
+                </ul>
+
+            </section>
+
+            <section id="tensionamento">
+                <h2><i class="material-icons-round">build_circle</i> 5.2 Tensionamento e Ajustes</h2>
+                <p>Toda manutenção só é realizada com a esteira <strong>desenergizada, bloqueada e etiquetada (LOTO)</strong> e o caminhão estacionado. Ver a seção <a href="#seguranca" style="color: var(--accent);">Segurança</a>.</p>
+
+                <h3>5.2.1 Tensionamento da Correia — Fusop M20</h3>
+                <p>A correia CT V220B 05M00 <strong>alonga com o uso</strong>. Folga excessiva provoca escorregamento, salto de correia sobre o rolo e desgaste prematuro das bordas; tensão excessiva sobrecarrega os eixos dos roletes, a guia central e os mancais dos rolos.</p>
+                <p>O tensionamento é feito pelo <strong>esticador de fusop M20</strong>, montado na cabeceira oposta. <strong>É o único ajuste de tensão da máquina</strong> — não há eixo motorizado, hidráulico ou elétrico.</p>
+
+                <div class="img-wrapper" style="width: 70%;">
+                    <img src="imagens/tensor.jpg" onclick="openLightbox(this)" alt="Tensionador de correia por fusop M20, com porca interna e porca externa">
+                    <span class="zoom-hint">Clique para ampliar</span>
+                </div>
+
+                <div class="component-box">
+                    <h4>Como o Fusop M20 Trabalha</h4>
+                    <ul>
+                        <li><strong>Porca M20 interna:</strong> é a porca de <strong>tração</strong>. Enquanto ela estiver apertada, o conjunto fica travado e o fusop não avança.</li>
+                        <li><strong>Porca M20 externa:</strong> é a porca de <strong>ajuste</strong>. É ela que avança o fusop e <strong>tensiona a correia</strong>.</li>
+                    </ul>
+                    <p style="margin:15px 0 0;"><strong>Regra:</strong> para tensionar, <strong>afrouxe a porca interna</strong> e depois <strong>aperte a externa</strong>. Na ordem inversa, nada acontece — e é o erro mais comum.</p>
+                </div>
+
+                <h4>Procedimento de Tensionamento</h4>
+                <ol>
+                    <li><strong>Desenergize e bloqueie</strong> a esteira no disjuntor do painel. Confirme a ausência de tensão com multímetro.</li>
+                    <li><strong>Afrouxe a porca M20 interna</strong> (2 a 3 voltas), liberando o avanço do fusop.</li>
+                    <li><strong>Aperte a porca M20 externa</strong> — este é o movimento que <strong>tensiona a correia</strong>. A cada volta, meça a deflexão.</li>
+                    <li><strong>Meça a deflexão</strong> no meio do vão, entre dois apoios consecutivos. O valor de referência de tensão é <strong>a definir com o fabricante da correia</strong>.</li>
+                    <li><strong>Reaperte a porca interna</strong> para travar o conjunto e registrar o valor.</li>
+                    <li>Ao atingir o <strong>limite do curso do esticador (140 mm)</strong>, a correia deve ser <strong>reencintrada ou substituída</strong>.</li>
+                </ol>
+
+                <div class="alert-box">
+                    <i class="material-icons-round">report</i>
+                    <div>
+                        <h4>Tensão excessiva</h4>
+                        <p style="margin:0; text-align: left;">Se a correia ficar visivelmente <strong>esticada e enrijida</strong> logo após a saída do rolo, a tensão está alta demais. O efeito colateral é o <strong>aquejamento dos mancais dos roletes</strong> e o <strong>estufamento da guia central</strong> — que não é regulável e significa substituição do conjunto.</p>
+                    </div>
+                </div>
+
+                <h3>5.2.2 Correção de Corredor</h3>
+                <p>Se a correia <strong>atravessar mais para um lado do que para o outro</strong> (corrida lateral), o ajuste é feito <strong>também pelo fusop M20</strong>: basta <strong>apertar mais o lado para onde a correia está atravessando</strong>, para que ela deixe de correr.</p>
+
+                <div class="component-box">
+                    <h4>Procedimento de Correção de Corredor</h4>
+                    <ol>
+                        <li><strong>Afrouxe a porca M20 interna</strong> do lado em que a correia está atravessando.</li>
+                        <li><strong>Aperte a porca M20 externa</strong> desse mesmo lado, em meia volta por vez.</li>
+                        <li><strong>Reaperte a porca interna</strong> e observe a nova posição da correia.</li>
+                        <li><strong>Repita</strong> até a correia centralizar sobre a guia central.</li>
+                        <li>Se ao centralizar a <strong>tensão ficou fora do valor</strong>, reequilibre o conjunto apertando o lado oposto.</li>
+                    </ol>
+                </div>
+
+                <div class="warn-box">
+                    <i class="material-icons-round">swap_horiz</i>
+                    <div>
+                        <h4>Ordem importa</h4>
+                        <p style="margin:0; text-align: left;">Ajuste <strong>tensão e corredor no mesmo fusop</strong>. Por isso, sempre <strong>reaperte a porca interna</strong> depois de cada meia volta: se ela ficar frouxa durante o percurso, a correia pode <strong>dar um salto</strong> para o lado oposto, desfazendo o alinhamento.</p>
+                    </div>
+                </div>
+
+                <ul>
+                    <li><strong>Correia corre para o lado</strong>: apertar mais o lado para o qual ela corre.</li>
+                    <li><strong>Correia muito tensionada e desalinhada ao mesmo tempo:</strong> resolva primeiro a tensão, depois o corredor.</li>
+                    <li><strong>Desgaste irregular nas bordas:</strong> sinal de desalinhamento crônico, não de tensionamento.</li>
+                </ul>
+
+                <h3>5.2.3 Tensionamento da Corrente de Tração (base do Motoredutor)</h3>
+                <p>A corrente de tração transmite o movimento do redutor ao <strong>rolo de tração</strong>. O tensionamento desta corrente é <strong>independente</strong> do fusop M20: é feito deslizando a <strong>base do motoredutor</strong> nos furos <strong>oblongos</strong>.</p>
+
+                <div class="img-wrapper" style="width: 80%;">
+                    <img src="imagens/corrente_tracao.jpg" onclick="openLightbox(this)" alt="Tensionador da corrente de tração na base do motoredutor, com os 6 parafusos e o motor de tração">
+                    <span class="zoom-hint">Clique para ampliar</span>
+                </div>
+
+                <div class="component-box">
+                    <h4>Por que a base é Ajustável</h4>
+                    <p style="margin:0;">A base do motoredutor é fixada com <strong>6 parafusos</strong> em furos <strong>oblongos</strong>, que permitem deslocar o conjunto no sentido longitudinal. Ao correr a base, o operador ajusta o aperto da corrente. Ao final, os <strong>6 parafusos são reaperto</strong> para travar a posição.</p>
+                </div>
+
+                <h4>Procedimento de Ajuste</h4>
+                <ol>
+                    <li><strong>Desenergize e bloqueie</strong> (LOTO). O caminhão deve estar estacionado.</li>
+                    <li><strong>Afrouxe os 6 parafusos</strong> da base do motoredutor. Afrouxe todos — travar parcialmente impede o deslizamento e desalinha a corrente.</li>
+                    <li><strong>Corra a base</strong> no oblongo, no sentido que <strong>aumente a tensão da corrente</strong>, até que ela <strong>encaixe</strong> plenamente no conjunto do rolo.</li>
+                    <li><strong>Reaperte os 6 parafusos</strong> da base, de forma cruzada e uniforme.</li>
+                    <li><strong>Verifique</strong> girando a esteira manualmente: a corrente deve estar firme, sem salto de dente e sem folga perceptível.</li>
+                </ol>
+
+                <div class="alert-box">
+                    <i class="material-icons-round">warning</i>
+                    <div>
+                        <h4>Erros mais comuns</h4>
+                        <p style="margin:0; text-align: left;"><strong>(a)</strong> Esquecer de reapertar os 6 parafusos — a base solta durante a operação e a corrente perde tensão.<br>
+                        <strong>(b)</strong> Afrouxar apenas alguns parafusos — a base torce e a corrente fica desalinhada.<br>
+                        <strong>(c)</strong> Esticar demais — o excesso de tensão sobrecarrega os mancais do redutor e do rolo de tração, encurtando a vida útil de toda a corrente.</p>
+                    </div>
+                </div>
+
+                <div class="warn-box">
+                    <i class="material-icons-round">settings</i>
+                    <div>
+                        <h4>Correia e corrente: ajustes diferentes</h4>
+                        <p style="margin:0 0 10px; text-align: left;">Não confunda os dois tensionadores. O <strong>fusop M20</strong> ajusta a <strong>correia</strong> (lado do esticador). A <strong>base oblonga com 6 parafusos</strong> ajusta a <strong>corrente de tração</strong> (lado do motoredutor). Ajustar a corrente não aumenta a tensão da correia, e vice-versa.</p>
+                        <p style="margin:0;">O curso dos furos oblongos da base permite ajustar a tensão da corrente conforme o alongamento em uso.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="correia">
+                <h2><i class="material-icons-round">texture</i> 5.3 Correia e Emenda</h2>
+
+                <h3>Especificação da Correia</h3>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Campo</th>
+                                <th>Valor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Tipo</td><td>CT V220B</td></tr>
+                            <tr><td>Construção</td><td>PVC, 2 lonas, preto fosco</td></tr>
+                            <tr><td>Trama</td><td>05M00</td></tr>
+                            <tr><td>Largura</td><td>800 mm</td></tr>
+                            <tr><td>Guia</td><td>Com guia central (canal usinado nos rolos e na mesa)</td></tr>
+                            <tr><td>Diâmetro do rolo de tração</td><td>112 mm</td></tr>
+                            <tr><td>Diâmetro do rolo de tração (D)</td><td>112 mm</td></tr>
+                            <tr><td>Perímetro de percurso</td><td>23.872 mm</td></tr>
+                            <tr><td>Curso do esticador</td><td>140 mm</td></tr>
+                            <tr><td>Comprimento de referência</td><td>≈ 24.012 mm (sem folga de emenda)</td></tr>
+                            <tr><td>Emenda</td><td>A definir com o fornecedor da lona</td></tr>
+                            <tr><td>Aclive de operação</td><td>________ % (registrar na operação)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Canais da Guia Central</h3>
+                <p>A guia central não apoia sobre a correia: ela <strong>entra em canal</strong> usinado nos componentes. <strong>Os três canais precisam ser modelados</strong> — são eles que sustentam e alinh a correia ao longo de todo o percurso.</p>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Componente</th>
+                                <th>Canal</th>
+                                <th>Função</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Rolo de tração</strong></td>
+                                <td>Modelar</td>
+                                <td>Guiar a correia na entrada, mantendo a guia central no eixo</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Rolo esticador</strong></td>
+                                <td>Modelar</td>
+                                <td>Guiar a correia na saída, durante o curso de ajuste de tensão</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Mesa</strong></td>
+                                <td>Modelar</td>
+                                <td>Sustentar a guia central por toda a extensão da mesa</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="alert-box">
+                    <i class="material-icons-round">build</i>
+                    <div>
+                        <h4>Atenção: canal não usinado</h4>
+                        <p style="margin:0; text-align: left;">Se qualquer um dos <strong>três canais</strong> não for usinado, a guia central não engata corretamente, a correia perde o alinhamento e a tensão não se aplica de forma uniforme. O sintoma típico é a correia <strong>correr para um dos lados</strong> e desenvolver desgaste irregular nas bordas. Antes de instalar a correia, <strong>confirme os três canais</strong>.</p>
+                    </div>
+                </div>
+
+                <h3>Cuidados no Manuseio</h3>
+                <ul>
+                    <li><strong>Não dobre a correia no sentido longitudinal</strong> — dobre apenas no sentido transversal, com o lado externo para fora.</li>
+                    <li><strong>Mantenha a correia enrolada</strong> sobre o suporte e longe do piso para evitar contamination por óleo ou poeira.</li>
+                    <li><strong>Limpe a correia</strong> com escova e pano antes de qualquer emenda. A superfície precisa estar limpa e sem gordura.</li>
+                    <li><strong>Guarde em local seco e coberto</strong> — PVC e tramas de poliéster degradam com umidade e luz solar prolongada.</li>
+                </ul>
+
+                <h3>Sobre a Emenda</h3>
+                <p>A correia opera em ciclo contínuo, o que provoca <strong>alongamento</strong>. A emenda é o ponto mais frágil do conjunto. O <strong>tipo de emenda é definido com o fornecedor da lona</strong>, e dois tipos são aceitos neste equipamento:</p>
+                <ul>
+                    <li><strong>O tipo de emenda é definido com o fornecedor da lona.</strong> Solicitar a especificação da emenda junto com a cotação da correia.</li>
+
+                </ul>
+
+                <div class="alert-box">
+                    <i class="material-icons-round">link</i>
+                    <div>
+                        <h4>Emenda é um ponto crítico</h4>
+                        <p style="margin:0; text-align: left;">A emenda mal executada é a principal causa de <strong>rasgo em cascade</strong>: um pequeno solto no ponto de emenda evolui rapidamente e derruba a correia inteira. A emenda deve ser feita por <strong>empresa especializada</strong>, com prensa e matriz corretas para a largura de 800 mm. Não improvise em campo.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="guia-central">
+                <h2><i class="material-icons-round">center_focus_strong</i> 5.4 Guia Central e Roletes da Mesa</h2>
+                <p>A <strong>guia central K13</strong> é a espinha dorsal da esteira. Ela sustenta a correia pelo centro e concentra o peso do pacote no conjunto de roletes, aliviando as longarinas. É o componente que mais influencia o alinhamento e a vida útil da correia.</p>
+
+                <h3>Estrutura</h3>
+                <ul>
+                    <li><strong>Barra guia central:</strong> perfil fixo, apoia a correia pelo lado do <em>HIP</em> (retorno).</li>
+                    <li><strong>Conjunto de roletes da guia:</strong> sustentam a correia pelo lado da carga, mantendo-a nivelada.</li>
+                    <li><strong>Eixos e mancais:</strong> sustentação dos roletes nos quadros intermediários.</li>
+                </ul>
+
+                <h3>Procedimentos de Manutenção</h3>
+                <ol>
+                    <li><strong>Inspecione o desgaste da barra guia.</strong> Sulcos na face de contato da correia indicam que a correia já passou por ali muitas vezes — se o sulco é profundo, a barra precisa ser <strong>trocada</strong>.</li>
+                    <li><strong>Verifique o aperto dos parafusos</strong> dos quadros de sustentação da guia, dos dois lados.</li>
+                    <li><strong>Confira o giro dos roletes da guia.</strong> Rolete travado cria um ponto de tensão na correia e acelera o desgaste da emenda.</li>
+                    <li><strong>Limpe a região sob a correia.</strong> O acúmulo de poeira e serragem forma uma crosta que rasga a face inferior da correia.</li>
+                    <li><strong>Verifique o alinhamento longitudinal:</strong> a guia deve estar reta e paralela às longarinas.</li>
+                </ol>
+
+                <h4>Diagnóstico Rápido</h4>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Defeito Observado</th>
+                                <th>Causa</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Correia rasga sempre no mesmo ponto</td><td>Rolete travado ou barra guia com sulco</td><td>Trocar o rolete ou a barra guia</td></tr>
+                            <tr><td>Barra guia com folga lateral</td><td>Parafusos de fixação frouxos</td><td>Reapertar e verificar o esquadro</td></tr>
+                            <tr><td>Estalos ao passar o pacote</td><td>Roletes da guia sem graxa</td><td>Lubrificar conforme plano de lubrificação</td></tr>
+                            <tr><td>Face inferior da correia opaca e dura</td><td>Contaminação por óleo e poeira</td><td>Limpar e corrigir a vedação</td></tr>
+                            <tr><td>Estalo ao girar o rolo (com a esteira parada)</td><td>Rolamento EX206 com defeito / falta de graxa</td><td>Girar o rolo manualmente e escutar</td><td>Lubrificar; se persistir, trocar mancal F206 + rolamento EX206 juntos</td></tr>
+                            <tr><td>Correia corre torta e o rolo vibra</td><td>Folga excessiva no rolamento / mancal frouxo</td><td>Verificar folga e aperto do mancal</td><td>Reapertar o mancal; trocar o par F206 + EX206</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="rodizio">
+                <h2><i class="material-icons-round">cast</i> 5.5 Rodízios e Estrutura</h2>
+
+                <h3>Cuidados com os Rodízios</h3>
+                <ul>
+                    <li><strong>Capacidade de carga:</strong> o conjunto pesa <strong>980 kg</strong> sobre 4 rodízios, o que dá <strong>245 kg por rodízio</strong>. A capacidade nominal de cada rodízio tem de ser superior a esse valor.</li>
+                    <li><strong>Acionar o freio</strong> antes de o operador entrar no baú. Rodízio sem freio não segura a estaira na rampa.</li>
+                    <li><strong>Não forçar a entrada no baú:</strong> o batimento contra a traseira danifica o aro e pode quebrar o pino de fixação da estrutura.</li>
+                    <li><strong>Girar corretamente:</strong> arraste a estrutura pelo chassi, nunca pelo cabo elétrico, pela correia ou pelo painel.</li>
+
+                </ul>
+
+                <h3>Manutenção Periódica</h3>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Ação</th>
+                                <th>Intervalo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Rolamento da roldana</td><td>Girar a roda; verificar folga e ruído</td><td>Semanal</td></tr>
+                            <tr><td>Amortecedor (dianteiros)</td><td>Inspecionar trincas e deformação</td><td>Mensal</td></tr>
+                            <tr><td>Furo da platina</td><td>Verificar aperto e ausência de folga</td><td>Mensal</td></tr>
+                            <tr><td>Freio (traseiros)</td><td>Testar se imobiliza completamente</td><td>Diária, antes do uso</td></tr>
+                            <tr><td>Graxas do conjunto</td><td>Aplicar graxa no rolamento</td><td>A cada 500 h</td></tr>
+                            <tr><td>Fusop M20 e porcas</td><td>Verificar aperto e ausência de rosca batida</td><td>Mensal</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Estrutura e Parafusos</h3>
+                <ul>
+                    <li>Reapertar os parafusos das <strong>uniões de campo</strong> periodicamente — o vibrado da operação solta.</li>
+                    <li>Verificar se as travessas de amarração não têm deformação, fissura de solda ou corrosão.</li>
+                    <li>Manter o chassi <strong>limpo e sem acúmulo de serragem</strong> sob as longarinas — o acúmulo retém umidade e acelera a corrosão.</li>
+                    <li>Se houver <strong>ponto de corrosão</strong> na estrutura, não ignore: limpe, aplique primer e repintura antes que vire furo.</li>
+                </ul>
+            </section>
+
+            <section id="mancais">
+                <h2><i class="material-icons-round">settings</i> 5.6 Mancais, Rolamentos e Engrenagens</h2>
+                <p>Os apoios do conjunto são <strong>mancais tipo F206</strong> montados com <strong>rolamentos tipo EX206</strong>. Este é o par padronizado do equipamento: ao comprar, informe exatamente <strong>F206 + EX206</strong> — rolamentos com outras letras não montam no mancal.</p>
+
+                <div class="img-wrapper" style="width: 80%;">
+                    <img src="imagens/cabeceira_tracao.jpg" onclick="openLightbox(this)" alt="Cabeceira de tração: rolo de tração com canal da guia central, mancais F206 e engrenagem 1.50.18">
+                    <span class="zoom-hint">Clique para ampliar</span>
+                </div>
+
+                <h3>Especificação dos Mancais</h3>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Quantidade</th>
+                                <th>Especificação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>Mancal</strong></td><td><strong>5</strong></td><td>F206 — corpo em ferro fundido, fixação por flange</td></tr>
+                            <tr><td><strong>Rolamento</strong></td><td><strong>5</strong></td><td>EX206 — rolamento de contato profundo, anel interno extended (anel interno estendido)</td></tr>
+                            <tr><td>Furo interno</td><td>—</td><td>30 mm (padronizado do par F206 / EX206)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p style="font-size: 0.85rem; color: #5d748a;">Dos 5 mancais, <strong>1 fica na base do redutor</strong> e os demais nos rolos. Conferir a distribuição exata (um de cada lado) no plano mecânico antes de cotar.</p>
+
+                <h3>Engrenagens da Corrente de Tração</h3>
+                <p>A transmissão do redutor até o rolo de tração é feita por <strong>corrente</strong>, com uma engrenagem em cada extremidade:</p>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Peça</th>
+                                <th>Código</th>
+                                <th>Dentes</th>
+                                <th>Diâmetro de passo</th>
+                                <th>Observação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Engrenagem no <strong>rolo de tração</strong></td>
+                                <td><strong>1.50.18</strong></td>
+                                <td>18</td>
+                                <td>91,4 mm</td>
+                                <td>Menor — acoplada ao eixo do rolo</td>
+                            </tr>
+                            <tr>
+                                <td>Engrenagem no <strong>redutor</strong></td>
+                                <td><strong>1.50.35</strong></td>
+                                <td>35</td>
+                                <td>177,1 mm</td>
+                                <td>Maior — acoplada à saída do redutor</td>
+                            </tr>
+                            <tr>
+                                <td>Relação de redução</td>
+                                <td colspan="4"><strong>1,944 : 1</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="img-wrapper" style="width: 85%;">
+                    <img src="imagens/mancais_engrenagens.jpg" onclick="openLightbox(this)" alt="Mancais F206 com rolamentos EX206 e engrenagens de tração 1.50.18 e 1.50.35 na cabeceira de tração">
+                    <span class="zoom-hint">Clique para ampliar</span>
+                </div>
+
+                <h4>Especificação da Corrente</h4>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Parâmetro</th>
+                                <th>Valor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Padrão</td><td><strong>ASA 50</strong> (ANSI 50 / ISO 10B-1)</td></tr>
+                            <tr><td>Passo</td><td>15,875 mm</td></tr>
+                            <tr><td><strong>Número de elos</strong></td><td><strong>64 elos</strong></td></tr>
+                            <tr><td><strong>Comprimento</strong></td><td><strong>1.016 mm</strong></td></tr>
+                            <tr><td>Número de elos</td><td><strong>64 elos</strong></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="component-box">
+                    <h4>Para Cotação</h4>
+                    <p style="margin:0;"><strong>Corrente ASA 50 · 64 elos · 1.016 mm de comprimento</strong></p>
+                </div>
+
+
+
+                <h3>Manutenção dos Mancais e Rolamentos</h3>
+                <ul>
+                    <li><strong>Girar o rolo manualmente</strong> antes de ligar: deve girar <strong>liso e silencioso</strong>. Qualquer estalo ou arrasto é sinal de rolamento com defeito.</li>
+                    <li><strong>Verificar folga radial e axial.</strong> Folga excessiva gera vibração no rolo e faz a correia correr torta.</li>
+                    <li><strong>Aperto dos parafusos do mancal</strong> — reaperte periodicamente; a vibração da operação solta.</li>
+                    <li><strong>Não passar o peso do rolamento pela Race Externa</strong> ao montar: force pelo anel interno (o que recebe carga) para não marcar as pistas.</li>
+                    <li><strong>Verificar a vedação</strong> (retentor / escova) — entrada de poeira destrói o rolamento silenciosamente.</li>
+                    <li><strong>Trocar mancal e rolamento juntos.</strong> Rolamento novo em mancal velho (com pista desgastada) falha cedo.</li>
+                </ul>
+            </section>
+
+            <section id="motor">
+                <h2><i class="material-icons-round">electric_bolt</i> 5.7 Motor e Redutor</h2>
+
+                <h3>Acionamento (Somente Mecânico)</h3>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Especificação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>Motor</strong></td><td>WEG 2,2 kW / 3 cv — flange 90 B14</td></tr>
+                            <tr><td>Rotação</td><td>4 polos — 1.750 rpm a 60 Hz</td></tr>
+                            <tr><td><strong>Redutor</strong></td><td>WEG WCG01 V90 1HH C90 2,2 kW 4P — tamanho 090</td></tr>
+                            <tr><td>Relação</td><td>i = 1:20 (coroa e sem-fim)</td></tr>
+                            <tr><td>Rotação de saída do redutor</td><td>87,5 rpm</td></tr>
+                            <tr><td>Transmissão até o rolo</td><td>Corrente de tração — engrenagens <strong>1.50.35</strong> (redutor, 35 dentes) e <strong>1.50.18</strong> (rolo, 18 dentes)</td></tr>
+                            <tr><td>Relação da corrente</td><td>1,944 : 1</td></tr>
+                            <tr><td>Rotação do rolo de tração</td><td>87,5 ÷ 1,944 ≈ 45,0 rpm</td></tr>
+                            <tr><td>Base</td><td>Rígida, com 6 parafusos em furos oblongos e 1 mancal F206</td></tr>
+                            <tr><td>Posição</td><td>Na frente, puxando a correia</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Motor Elétrico</h3>
+                <ul>
+                    <li><strong>Confirme a tensão de alimentação:</strong> motor de 220 V só pode ser ligado em rede de 220 V. Ligar 380 V em motor de 220 V <strong>queima o motor</strong>. Um motor de 2,2 kW em 380 V trabalha com corrente bem menor do que em 220 V — confira a placa antes de ligar.</li>
+                    <li><strong>Limpeza da carcaça:</strong> mantenha as aletas livres de serragem e poeira, para garantir a dissipação de calor.</li>
+                    <li><strong>Ventilação:</strong> nunca operar com o ventilador ou a tampa do borne danificados.</li>
+                    <li><strong>Ruído e cheiro:</strong> zumbido alto, estalo ou cheiro de queimado = desenergize imediatamente.</li>
+                </ul>
+
+                <h3>Redutor coroa e sem-fim</h3>
+                <ul>
+                    <li>Verifique <strong>vazamento</strong> de óleo em tampa, olhais e vedações.</li>
+                    <li>Um <strong>zumbido contínuo</strong> indica falta de lubrificação; um <strong>estalo intermitente</strong> indica dente da coroa desgastado.</li>
+                    <li>Verifique o <strong>aperto dos parafusos de fixação</strong> e o alinhamento do acoplamento. Vibração excessiva é a principal causa de ruptura de dentes.</li>
+                    <li>O <strong>respiro</strong> (breather) deve estar limpo, permitindo a saída de gases.</li>
+                </ul>
+            </section>
+
+            <section id="diagnostico">
+                <h2><i class="material-icons-round">troubleshoot</i> 6. Diagnóstico de Falhas</h2>
+                <p>Utilize a tabela abaixo para identificar rapidamente a causa raiz das falhas mais comuns. Antes de qualquer reparo, <strong>desenergize e bloqueie o equipamento (LOTO)</strong>.</p>
+
+                <div class="diag-filters">
+                    <button class="diag-filter active" onclick="filterDiag('todas', this)"><span class="dot" style="background:#64ffda"></span> Todas</button>
+                    <button class="diag-filter" onclick="filterDiag('critico', this)"><span class="dot" style="background:#ff5252"></span> Crítico — pare a máquina</button>
+                    <button class="diag-filter" onclick="filterDiag('atencao', this)"><span class="dot" style="background:#ffca28"></span> Atenção — não continue sem corrigir</button>
+                    <button class="diag-filter" onclick="filterDiag('ajuste', this)"><span class="dot" style="background:#64ffda"></span> Ajuste — corrija na próxima parada</button>
+                </div>
+
+                <div class="diag-grid" id="diagGrid">
+
+                    <div class="diag-card sev-critico">
+                        <div class="diag-head">
+                            <div class="diag-num">1</div>
+                            <div><span class="diag-badge">Crítico</span><div class="diag-title">Esteira rola no baú</div></div>
+                        </div>
+                        <div class="diag-row causa"><i class="material-icons-round">help_outline</i><div><b>Causa</b><span>Freio não acionado ou desgastado</span></div></div>
+                        <div class="diag-row check"><i class="material-icons-round">search</i><div><b>Verificar</b><span>Acionamento e retenção do freio</span></div></div>
+                        <div class="diag-row fix"><i class="material-icons-round">build</i><div><b>Ação</b><span>Não operar sem freio. Substituir o freio</span></div></div>
+                    </div>
+
+                    <div class="diag-card sev-critico">
+                        <div class="diag-head">
+                            <div class="diag-num">2</div>
+                            <div><span class="diag-badge">Crítico</span><div class="diag-title">Cordão de emergência não aciona</div></div>
+                        </div>
+                        <div class="diag-row causa"><i class="material-icons-round">help_outline</i><div><b>Causa</b><span>Reforço central tapando o percurso do cabo, cabo solto ou interruptor com defeito</span></div></div>
+                        <div class="diag-row check"><i class="material-icons-round">search</i><div><b>Verificar</b><span>Puxar o cabo em toda a extensão e observar o interruptor Schmersal</span></div></div>
+                        <div class="diag-row fix"><i class="material-icons-round">build</i><div><b>Ação</b><span>Remover o obstáculo do canal, retensionar o cabo, trocar o interruptor</span></div></div>
+                    </div>
+
+                    <div class="diag-card sev-critico">
+                        <div class="diag-head">
+                            <div class="diag-num">3</div>
+                            <div><span class="diag-badge">Crítico</span><div class="diag-title">Motor quente demais</div></div>
+                        </div>
+                        <div class="diag-row causa"><i class="material-icons-round">help_outline</i><div><b>Causa</b><span>Sobrecarga, poeira na carcaça ou ventilação obstruída</span></div></div>
+                        <div class="diag-row check"><i class="material-icons-round">search</i><div><b>Verificar</b><span>Corrente de linha, aletas da carcaça e ventilador</span></div></div>
+                        <div class="diag-row fix"><i class="material-icons-round">build</i><div><b>Ação</b><span>Desenergizar. Limpar a carcaça e trocar o ventilador</span></div></div>
+                    </div>
+
+                    <div class="diag-card sev-critico">
+                        <div class="diag-head">
+                            <div class="diag-num">4</div>
+                            <div><span class="diag-badge">Crítico</span><div class="diag-title">Disjuntor aciona sozinho</div></div>
+                        </div>
+                        <div class="diag-row causa"><i class="material-icons-round">help_outline</i><div><b>Causa</b><span>Sobrecarga, falta de fase ou motor com defeito</span></div></div>
+                        <div class="diag-row check"><i class="material-icons-round">search</i><div><b>Verificar</b><span>Corrente nas 3 fases e tensão da rede</span></div></div>
+                        <div class="diag-row fix"><i class="material-icons-round">build</i><div><b>Ação</b><span>Conferir fase, tensão da rede e estado do motor</span></div></div>
+                    </div>
+
+                    <div class="diag-card sev-atencao">
+                        <div class="diag-head">
+                            <div class="diag-num">5</div>
+                            <div><span class="diag-badge">Atenção</span><div class="diag-title">Corrente de tração frouxa ou pulando dente</div></div>
+                        </div>
+                        <div class="diag-row causa"><i class="material-icons-round">help_outline</i><div><b>Causa</b><span>Base do motoredutor frouxa ou corrida sem reaperto</span></div></div>
+                        <div class="diag-row check"><i class="material-icons-round">search</i><div><b>Verificar</b><span>Os 6 parafusos da base e a tensão da corrente</span></div></div>
+                        <div class="diag-row fix"><i class="material-icons-round">build</i><div><b>Ação</b><span>Afrouxar os 6 parafusos, correr a base no oblongo até a corrente encaixar e reapertar</span></div></div>
+                    </div>
+
+                    <div class="diag-card sev-atencao">
+                        <div class="diag-head">
+                            <div class="diag-num">6</div>
+                            <div><span class="diag-badge">Atenção</span><div class="diag-title">Base do motoredutor se desloca em operação</div></div>
+                        </div>
+                        <div class="diag-row causa"><i class="material-icons-round">help_outline</i><div><b>Causa</b><span>6 parafusos não reapertados após o ajuste</span></div></div>
+                        <div class="diag-row check"><i class="material-icons-round">search</i><div><b>Verificar</b><span>O aperto dos 6 parafusos da base</span></div></div>
+                        <div class="diag-row fix"><i class="material-icons-round">build</i><div><b>Ação</b><span>Reapertar e refazer o tensionamento da corrente</span></div></div>
+                    </div>
+
+                    <div class="diag-card sev-atencao">
+                        <div class="diag-head">
+                            <div class="diag-num">7</div>
+                            <div><span class="diag-badge">Atenção</span><div class="diag-title">Correia rasga sempre no mesmo ponto</div></div>
+                        </div>
+                        <div class="diag-row causa"><i class="material-icons-round">help_outline</i><div><b>Causa</b><span>Emenda fraca ou rolete travado</span></div></div>
+                        <div class="diag-row check"><i class="material-icons-round">search</i><div><b>Verificar</b><span>A emenda e os roletes da mesa</span></div></div>
+                        <div class="diag-row fix"><i class="material-icons-round">build</i><div><b>Ação</b><span>Trocar o rolete e refazer a emenda com o fornecedor da lona</span></div></div>
+                    </div>
+
+                    <div class="diag-card sev-atencao">
+                        <div class="diag-head">
+                            <div class="diag-num">8</div>
+                            <div><span class="diag-badge">Atenção</span><div class="diag-title">Rodízio travado ou com folga</div></div>
+                        </div>
+                        <div class="diag-row causa"><i class="material-icons-round">help_outline</i><div><b>Causa</b><span>Rolamento desgastado ou eixo frouxo</span></div></div>
+                        <div class="diag-row check"><i class="material-icons-round">search</i><div><b>Verificar</b><span>Girar a roda e medir a folga lateral</span></div></div>
+                        <div class="diag-row fix"><i class="material-icons-round">build</i><div><b>Ação</b><span>Substituir o rodízio (o conjunto pesa 980 kg — usar apoio)</span></div></div>
+                    </div>
+
+                    <div class="diag-card sev-atencao">
+                        <div class="diag-head">
+                            <div class="diag-num">9</div>
+                            <div><span class="diag-badge">Atenção</span><div class="diag-title">Vibração intensa</div></div>
+                        </div>
+                        <div class="diag-row causa"><i class="material-icons-round">help_outline</i><div><b>Causa</b><span>Acoplamento desalinhado, base frouxa ou rodízio danificado</span></div></div>
+                        <div class="diag-row check"><i class="material-icons-round">search</i><div><b>Verificar</b><span>Acoplamento, parafusos da base e rodízios</span></div></div>
+                        <div class="diag-row fix"><i class="material-icons-round">build</i><div><b>Ação</b><span>Alinhar o acoplamento, reapertar e trocar o rodízio</span></div></div>
+                    </div>
+
+                    <div class="diag-card sev-atencao">
+                        <div class="diag-head">
+                            <div class="diag-num">10</div>
+                            <div><span class="diag-badge">Atenção</span><div class="diag-title">Redutor vaza óleo</div></div>
+                        </div>
+                        <div class="diag-row causa"><i class="material-icons-round">help_outline</i><div><b>Causa</b><span>Retentor ou tampa danificada</span></div></div>
+                        <div class="diag-row check"><i class="material-icons-round">search</i><div><b>Verificar</b><span>Local do vazamento e nível de óleo</span></div></div>
+                        <div class="diag-row fix"><i class="material-icons-round">build</i><div><b>Ação</b><span>Trocar o retentor e repor o óleo</span></div></div>
+                    </div>
+
+                    <div class="diag-card sev-atencao">
+                        <div class="diag-head">
+                            <div class="diag-num">11</div>
+                            <div><span class="diag-badge">Atenção</span><div class="diag-title">Esteira não liga</div></div>
+                        </div>
+                        <div class="diag-row causa"><i class="material-icons-round">help_outline</i><div><b>Causa</b><span>Sem energia, disjuntor acionado ou botão travado</span></div></div>
+                        <div class="diag-row check"><i class="material-icons-round">search</i><div><b>Verificar</b><span>Tensão na tomada e estado do disjuntor</span></div></div>
+                        <div class="diag-row fix"><i class="material-icons-round">build</i><div><b>Ação</b><span>Reconectar, resetar o disjuntor ou trocar o botão</span></div></div>
+                    </div>
+
+                    <div class="diag-card sev-ajuste">
+                        <div class="diag-head">
+                            <div class="diag-num">12</div>
+                            <div><span class="diag-badge">Ajuste</span><div class="diag-title">Correia corre para um lado</div></div>
+                        </div>
+                        <div class="diag-row causa"><i class="material-icons-round">help_outline</i><div><b>Causa</b><span>Correia atravessando mais para um lado</span></div></div>
+                        <div class="diag-row check"><i class="material-icons-round">search</i><div><b>Verificar</b><span>A corrida da correia sobre a guia central</span></div></div>
+                        <div class="diag-row fix"><i class="material-icons-round">build</i><div><b>Ação</b><span>Apertar mais o lado para o qual ela atravessa, no fusop M20</span></div></div>
+                    </div>
+
+                    <div class="diag-card sev-ajuste">
+                        <div class="diag-head">
+                            <div class="diag-num">13</div>
+                            <div><span class="diag-badge">Ajuste</span><div class="diag-title">Correia não sai do lugar</div></div>
+                        </div>
+                        <div class="diag-row causa"><i class="material-icons-round">help_outline</i><div><b>Causa</b><span>Correia frouxa ou fusop M20 no fim de curso</span></div></div>
+                        <div class="diag-row check"><i class="material-icons-round">search</i><div><b>Verificar</b><span>Deflexão da correia e curso restante do esticador</span></div></div>
+                        <div class="diag-row fix"><i class="material-icons-round">build</i><div><b>Ação</b><span>Afrouxar a porca interna e apertar a externa do fusop M20</span></div></div>
+                    </div>
+
+                    <div class="diag-card sev-ajuste">
+                        <div class="diag-head">
+                            <div class="diag-num">14</div>
+                            <div><span class="diag-badge">Ajuste</span><div class="diag-title">Motor gira mas a correia não move</div></div>
+                        </div>
+                        <div class="diag-row causa"><i class="material-icons-round">help_outline</i><div><b>Causa</b><span>Acoplamento quebrado, corrente solta ou correia frouxa</span></div></div>
+                        <div class="diag-row check"><i class="material-icons-round">search</i><div><b>Verificar</b><span>Acoplamento, aperto da base e tensão da correia</span></div></div>
+                        <div class="diag-row fix"><i class="material-icons-round">build</i><div><b>Ação</b><span>Trocar o acoplamento, tensionar a corrente e retensionar a correia</span></div></div>
+                    </div>
+
+                    <div class="diag-card sev-ajuste">
+                        <div class="diag-head">
+                            <div class="diag-num">15</div>
+                            <div><span class="diag-badge">Ajuste</span><div class="diag-title">Estalos ao passar o pacote</div></div>
+                        </div>
+                        <div class="diag-row causa"><i class="material-icons-round">help_outline</i><div><b>Causa</b><span>Rolete da mesa sem graxa ou barra guia com sulco</span></div></div>
+                        <div class="diag-row check"><i class="material-icons-round">search</i><div><b>Verificar</b><span>Girar o rolo com a esteira parada e escutar</span></div></div>
+                        <div class="diag-row fix"><i class="material-icons-round">build</i><div><b>Ação</b><span>Lubrificar; trocar a barra guia se houver sulco</span></div></div>
+                    </div>
+
+                    <div class="diag-card sev-ajuste">
+                        <div class="diag-head">
+                            <div class="diag-num">16</div>
+                            <div><span class="diag-badge">Ajuste</span><div class="diag-title">Fotocélula não detecta o pacote</div></div>
+                        </div>
+                        <div class="diag-row causa"><i class="material-icons-round">help_outline</i><div><b>Causa</b><span>Lente ou refletor sujos, sensor desalinhado</span></div></div>
+                        <div class="diag-row check"><i class="material-icons-round">search</i><div><b>Verificar</b><span>Limpar a lente e o refletor; conferir o alinhamento</span></div></div>
+                        <div class="diag-row fix"><i class="material-icons-round">build</i><div><b>Ação</b><span>Limpar e realinhar; se persistir, trocar sensor e refletor</span></div></div>
+                    </div>
+
+                    <div class="diag-card sev-ajuste">
+                        <div class="diag-head">
+                            <div class="diag-num">17</div>
+                            <div><span class="diag-badge">Ajuste</span><div class="diag-title">Pacote escorrega na correia</div></div>
+                        </div>
+                        <div class="diag-row causa"><i class="material-icons-round">help_outline</i><div><b>Causa</b><span>Aclive elevado, correia suja ou carga incompatível</span></div></div>
+                        <div class="diag-row check"><i class="material-icons-round">search</i><div><b>Verificar</b><span>Aclive real e limpeza da correia</span></div></div>
+                        <div class="diag-row fix"><i class="material-icons-round">build</i><div><b>Ação</b><span>Limpar a correia e ajustar o posicionamento</span></div></div>
+                    </div>
+
+                </div>
+
+                <div class="alert-box">
+                    <i class="material-icons-round">healing</i>
+                    <div>
+                        <h4>Quando acionar a assistência técnica</h4>
+                        <p style="margin:0; text-align: left;">Procure a Zico quando houver: <strong>substituição da correia ou refeitura de emenda</strong>, <strong>troca do rodízio MKA</strong>, <strong>troca da barra guia K13</strong>, <strong>defeito no redutor</strong> ou qualquer alteração de comprimento e inclinação. A equipe técnica dimensiona o conjunto para a carga real de papel higiênico e fornece o plano de manutenção.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="dados-tecnicos">
+                <h2><i class="material-icons-round">inventory_2</i> 7. Peças de Reposição</h2>
+
+
+            <h3>Lista de Peças</h3>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Descrição</th>
+                                <th>Un.</th>
+                                <th>Qtd.</th>
+                                <th>Observação</th>
+                                <th>Cotar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>———</td><td><strong>Redutor</strong> WEG WCG01 V90 1HH C90 2,2 kW 4P — tamanho 090</td><td>pc</td><td>1</td><td>Relação 1:20, coroa e sem-fim</td><td><a class="btn-cotar" href="https://wa.me/5547991866317?text=Solicito%20cotacao%20-%20Esteira%2028470%20-%20Redutor%20WEG%20WCG01%20V90%201HH%20C90%2022kW%204P%20tamanho%20090" target="_blank"><i class="material-icons-round">shopping_cart</i> Cotar</a></td></tr>
+                            <tr><td>———</td><td><strong>Correia</strong> CT V220B 05M00 — PVC 2 lonas, preto fosco, 800 mm</td><td>pc</td><td>1</td><td><strong>Comprimento total: 24.012 mm</strong> (fechado com o fabricante). Informar a medida real de campo</td><td><a class="btn-cotar" href="https://wa.me/5547991866317?text=Solicito%20cotacao%20-%20Esteira%2028470%20-%20Correia%20CT%20V220B%2005M00%20PVC%202%20lonas%20800mm%20-%20comprimento%2024.012mm" target="_blank"><i class="material-icons-round">shopping_cart</i> Cotar</a></td></tr>
+                            <tr><td>———</td><td><strong>Corrente de tração</strong> ASA 50 — 64 elos</td><td>pc</td><td>1</td><td><strong>Comprimento total: 1.016 mm</strong></td><td><a class="btn-cotar" href="https://wa.me/5547991866317?text=Solicito%20cotacao%20-%20Esteira%2028470%20-%20Corrente%20ASA%2050%2064%20elos%20-%201.016mm" target="_blank"><i class="material-icons-round">shopping_cart</i> Cotar</a></td></tr>
+                            <tr><td>———</td><td><strong>Engrenagem do rolo de tração</strong> — 1.50.18</td><td>pc</td><td>1</td><td>Conferir dentes, passo e furo conforme eixo do rolo</td><td><a class="btn-cotar" href="https://wa.me/5547991866317?text=Solicito%20cotacao%20-%20Esteira%2028470%20-%20Engrenagem%20do%20rolo%20de%20tracao%201.50.18" target="_blank"><i class="material-icons-round">shopping_cart</i> Cotar</a></td></tr>
+                            <tr><td>———</td><td><strong>Engrenagem do redutor</strong> — 1.50.35</td><td>pc</td><td>1</td><td>Conferir dentes, passo e furo conforme eixo do redutor</td><td><a class="btn-cotar" href="https://wa.me/5547991866317?text=Solicito%20cotacao%20-%20Esteira%2028470%20-%20Engrenagem%20do%20redutor%201.50.35" target="_blank"><i class="material-icons-round">shopping_cart</i> Cotar</a></td></tr>
+                            <tr><td>———</td><td><strong>Rolamento EX206</strong> (furo 30 mm)</td><td>pc</td><td>5</td><td>Monta no mancal F206 — citar o par F206 + EX206 na cotação</td><td><a class="btn-cotar" href="https://wa.me/5547991866317?text=Solicito%20cotacao%20-%20Esteira%2028470%20-%20Rolamento%20EX206%20furo%2030mm%20-%205%20unidades%20(mancal%20F206)" target="_blank"><i class="material-icons-round">shopping_cart</i> Cotar</a></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="alert-box">
+                    <i class="material-icons-round">inventory_2</i>
+                    <div>
+                        <h4>Solicitação de peças</h4>
+                        <p style="margin:0 0 12px; text-align: left;">Esta lista cobre apenas as <strong>peças de reposição</strong>: redutor, correia, corrente, engrenagens e rolamentos. Use o botão <strong>Cotar</strong> para solicitar direto pelo WhatsApp — o texto da peça já vai escrito, com o <strong>código de fabricação 28470</strong>.</p>
+                        <p style="margin:0 0 12px; text-align: left;"><strong>Cotação de peças:</strong> (47) 99186-6317 &nbsp;·&nbsp; <strong>Dúvidas sobre o equipamento:</strong> (47) 99186-5021</p>
+                        <p style="margin:0 0 12px; text-align: left;">Na cotação, informe também a <strong>aplicação</strong> (cabeceira motora / esticador) e uma <strong>foto da peça instalada</strong>.</p>
+                        <p style="margin:0; text-align: left;"><strong>Atenção:</strong> a <strong>correia</strong> deve ser cotada com o comprimento <strong>medido em campo</strong> — o valor teórico é só referência. No <strong>rolamento</strong>, cite sempre o par <strong>F206 + EX206</strong>.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RODAPÉ -->
+            <footer style="margin-top: 100px; padding: 40px 0; border-top: 1px solid var(--border); text-align: center; color: #5d748a; font-size: 0.9rem;">
+        <p><strong>TORNOARIA ZICO LTDA</strong> &copy; 2026 - Todos os direitos reservados.</p>
+        <p style="margin-top:8px;">Esteira de Alimentação de Carga CIA Canoinhas &mdash; código de fabricação <strong style="color:var(--accent);">28470</strong></p>
+        <p>Este documento é confidencial. A reprodução não autorizada é proibida.</p>
+
+        <div style="margin-top: 20px; display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; align-items: center;">
+
+            <a href="tel:+554736222020" style="color:var(--text-main); text-decoration:none; display: flex; align-items: center; gap: 5px;">
+                <i class="material-icons-round" style="color:var(--accent);">call</i>
+                (47) 3622-2020
+            </a>
+
+            <a href="https://wa.me/5547991865021" target="_blank" style="color:var(--text-white); text-decoration:none; background: rgba(37, 211, 102, 0.1); padding: 8px 15px; border-radius: 20px; border: 1px solid #25d366; display: flex; align-items: center; gap: 8px; transition: 0.3s;">
+                <i class="material-icons-round" style="color:#25d366;">chat</i>
+                <span style="color:#25d366; font-weight: bold;">Dúvidas sobre o equipamento: (47) 99186-5021</span>
+            </a>
+
+            <a href="mailto:augusto@tornoariazico.com.br" style="color:var(--text-main); text-decoration:none; display: flex; align-items: center; gap: 5px;">
+                <i class="material-icons-round" style="color:var(--accent);">email</i>
+                augusto@tornoariazico.com.br
+            </a>
+        </div>
+    </footer>
+
+        </div> <!-- Fecha Container -->
+    </main> <!-- Fecha Main -->
+
+    <!-- BOTÃO VOLTAR AO TOPO -->
+    <div id="backToTop" onclick="window.scrollTo(0,0)">
+        <i class="material-icons-round">arrow_upward</i>
+    </div>
+
+    <!-- BARRA DE CRÉDITO FIXA (visível durante toda a rolagem) -->
+    <div class="credit-bar">Manual desenvolvido por <strong>KWC Industrial TECH</strong></div>
+
+    <script>
+        // 1. Menu Mobile
+        function closeMenuMobile() {
+            if (window.innerWidth <= 900) {
+                document.querySelector('.sidebar').classList.remove('open');
+                document.querySelector('.sidebar-overlay').classList.remove('active');
+            }
+        }
+        document.querySelectorAll('.nav-item').forEach(link => {
+            link.addEventListener('click', closeMenuMobile);
+        });
+
+        // 2. Lightbox
+        function openLightbox(el) {
+            document.getElementById('lightbox-img').src = el.src;
+            document.getElementById('lightbox').style.display = 'flex';
+        }
+
+        // 3. Acordeão
+        function toggle(el) {
+            el.classList.toggle("active");
+            var p = el.nextElementSibling;
+            p.style.maxHeight = p.style.maxHeight ? null : p.scrollHeight + "px";
+        }
+
+        // 4. Animação Scroll
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+        });
+        document.querySelectorAll('.img-wrapper').forEach(img => observer.observe(img));
+
+        // 5. Scroll e Botão Topo
+        window.addEventListener('scroll', function() {
+            let current = '';
+            document.querySelectorAll('section').forEach(section => {
+                if (scrollY >= section.offsetTop - 200) current = section.getAttribute('id');
+            });
+            document.querySelectorAll('.nav-item').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current)) link.classList.add('active');
+            });
+            if (scrollY > 500) {
+                document.getElementById('backToTop').classList.add('show');
+            } else {
+                document.getElementToId('backToTop').classList.remove('show');
+            }
+        });
+
+        // 6. Filtro do Diagnóstico de Falhas
+        function filterDiag(tipo, btn) {
+            document.querySelectorAll('.diag-filter').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.diag-card').forEach(card => {
+                const mostrar = (tipo === 'todas') || card.className.includes('sev-' + tipo);
+                card.style.display = mostrar ? '' : 'none';
+            });
+        }
+
+        // 7. Busca
+        function searchManual() {
+            let input = document.getElementById('searchInput').value.toLowerCase();
+            let container = document.querySelector('.container');
+            document.querySelectorAll('.highlight-text').forEach(span => {
+                span.replaceWith(document.createTextNode(span.textContent));
+            });
+            container.normalize();
+            if (input.length < 3) return;
+            let regex = new RegExp(`(${input})`, "gi");
+            function highlight(node) {
+                if (node.nodeType === 3) {
+                    if (regex.test(node.data)) {
+                        let span = document.createElement('span');
+                        span.innerHTML = node.data.replace(regex, '<span class="highlight-text">$1</span>');
+                        node.replaceWith(span);
+                    }
+                } else if (node.nodeType === 1 && node.className !== 'highlight-text') {
+                    Array.from(node.childNodes).forEach(highlight);
+                }
+            }
+            highlight(container);
+            let first = document.querySelector('.highlight-text');
+            if (first) first.scrollIntoView({behavior: "smooth", block: "center"});
+        }
+    </script>
+</body>
+</html>
