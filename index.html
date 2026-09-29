@@ -381,6 +381,29 @@
         .diag-row b { display: block; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 1.2px; color: #5d748a; font-weight: 700; margin-bottom: 2px; }
         .diag-row span { color: #c0c7d6; text-align: left; }
 
+        /* --- BLOCO QR CODE (CAPA) --- */
+        .qr-block {
+            display: flex; align-items: center; gap: 30px; margin-top: 45px;
+            background: rgba(100, 255, 218, 0.03); border: 1px solid var(--border);
+            border-radius: 8px; padding: 26px 30px; flex-wrap: wrap;
+        }
+        .qr-block .img-wrapper { width: 250px; flex-shrink: 0; }
+        .qr-block img { -webkit-mask-image: none; mask-image: none; }
+        .qr-texto { flex: 1; min-width: 260px; }
+        .qr-texto h3 { margin: 0 0 10px 0; font-size: 1.2rem; }
+        .qr-texto p { font-size: 0.92rem; margin-bottom: 14px; }
+        .btn-acesso {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: transparent; border: 1px solid var(--accent); color: var(--accent);
+            padding: 10px 20px; border-radius: 4px; text-decoration: none;
+            font-weight: 700; font-size: 0.88rem; transition: 0.2s;
+        }
+        .btn-acesso:hover { background: var(--accent); color: var(--bg-body); }
+        .qr-url {
+            font-family: Consolas, monospace; font-size: 0.75rem; color: #5d748a;
+            margin-top: 14px; word-break: break-all;
+        }
+
         /* --- RESPONSIVO / MOBILE --- */
 
         /* 1. Telas grandes */
@@ -450,6 +473,13 @@
 
             /* Botao voltar ao topo */
             #backToTop { width: 44px; height: 44px; bottom: 52px; right: 16px; }
+
+            /* QR code empilha */
+            .qr-block { flex-direction: column; text-align: center; padding: 22px 18px; gap: 20px; }
+            .qr-block .img-wrapper { width: 210px !important; }
+            .qr-texto { min-width: 0; }
+            .qr-texto p { text-align: center; }
+            .qr-url { text-align: center; }
         }
 
         /* 5. Celulares pequenos */
@@ -617,6 +647,20 @@
                     <div class="data-card">
                         <strong>Versão do Documento</strong>
                         <span>01-26</span>
+                    </div>
+                </div>
+
+                <div class="qr-block">
+                    <div class="img-wrapper" style="width: 250px; margin: 0;">
+                        <img src="qrcode-manual.png" alt="QR code de acesso ao manual" style="border-radius: 6px;">
+                    </div>
+                    <div class="qr-texto">
+                        <h3>Acesso Digital</h3>
+                        <p>Aponte a câmera do celular para o código e abra o manual. Funciona em qualquer dispositivo, sem instalar nada.</p>
+                        <a class="btn-acesso" href="https://roodanalise.github.io/manual-esteira-cia-canoinhas/" target="_blank">
+                            <i class="material-icons-round">open_in_new</i> Abrir o manual online
+                        </a>
+                        <p class="qr-url">roodanalise.github.io/manual-esteira-cia-canoinhas</p>
                     </div>
                 </div>
             </section>
